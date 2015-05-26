@@ -85,10 +85,6 @@ int main (int argc, char *argv[])
  			printf ("[SERVIDOR] Enviei resposta ... (%d bytes)\n", n);
 			close (client_fd);
 		}
-
-		// clear request and response
-		memset (req.str, 0, sizeof (req));
-		memset (rep.str, 0, sizeof (req));
 	}
 
 	close (server_fd);
