@@ -13,19 +13,21 @@ void trata_sig (int i)
 	exit (EXIT_SUCCESS);
 }
 
-user_t find_user (pit_t client_pid)
+int find_user (pid_t client_pid, user_t *user)
 {
 	int i;
 	for (i = 0; i < MAX_USERS; i++)
-		if (client_pid == user_list[i].client_pid)
-			return user_list[i];
+		if (client_pid == user_list[i].client_pid) {
+			*user = user_list[i];
+			return 1;
+		}
 
-	return NULL;
+	return 0;
 }
 
 int main (int argc, char *argv[])
 {
-	int n;
+	int n, i;
 	char response[BUFF_SIZE];
 
 	FILE *user_fp;
@@ -40,7 +42,7 @@ int main (int argc, char *argv[])
 		exit (EXIT_FAILURE);
 	}
 
-	user_fp = open (argv[1], 'r');
+	user_fp = fopen (argv[1], "r");
 
 	if (access (SERVER_FIFO, F_OK) == 0) {
 		printf ("[ERRO] - Nao pode existir mais de um server\n");
@@ -65,10 +67,11 @@ int main (int argc, char *argv[])
 
 	while (1) {
 		// clear buffers
-		memset (&req.command[0], 0, sizeof (req.buffer));
+		memset (&req.command[0], 0, sizeof (req.command));
 		for (i = 0; i < 3; i++)
-			memset (&rep.arguement[i][0], 0, sizeof (rep.buffer));
+			memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
 
+		memset (&rep.buffer[0], 0, sizeof (rep.buffer));
 
 		// READ REQUEST
 		n = read (server_fd, &req, sizeof (req));
@@ -79,10 +82,10 @@ int main (int argc, char *argv[])
 		printf ("[READ] Request from %d ... (%d bytes)\n",
 			req.client_pid, n);
 
-		if (!strcmp ())
+		//if (!strcmp ())
 
 		// HANDLE REQUEST
-		if (!strcmp (req.buffer, "hello")) {
+		if (!strcmp (req.command, "hello")) {
 			sprintf (response, "Hello %d", req.client_pid);
 			strcpy (rep.buffer, response);
 		} else {

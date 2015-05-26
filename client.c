@@ -43,7 +43,7 @@ int main (void)
 	close (client_fd);
 
 	if (!strcmp (rep.buffer, "WRONG CREDENTIALS")) {
-		fprintf (stderr, "Usarname ou Password imcorrentos")
+		fprintf (stderr, "Usarname ou Password imcorrentos");
 
 		close (server_fd);
 		unlink (req.endereco);
@@ -61,9 +61,10 @@ int main (void)
 
 
 	// clear buffers
-	memset (&req.command[0], 0, sizeof (req.buffer));
+	memset (&req.command[0], 0, sizeof (req.command));
 	for (i = 0; i < 3; i++)
-		memset (&rep.arguement[i][0], 0, sizeof (rep.buffer));
+		memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
+	memset (&rep.buffer[0], 0, sizeof (rep.buffer));
 
 	do {
 		printf (">> ");
@@ -78,7 +79,7 @@ int main (void)
 		} while (word[i] != NULL);
 
 		if (word[0] != NULL) {
-			if (!strcmp word[0], "exit")
+			if (!strcmp (word[0], "exit"))
 				break;
 
 			if (!strcmp (word[0], "hello"))
@@ -96,8 +97,11 @@ int main (void)
 			close (client_fd);
 
 			// clear buffers
-			memset (&req.buffer[0], 0, sizeof (req.buffer));
+			memset (&req.command[0], 0, sizeof (req.command));
+			for (i = 0; i < 3; i++)
+				memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
 			memset (&rep.buffer[0], 0, sizeof (rep.buffer));
+
 		}
 	} while (strcmp (str, "exit"));
 
