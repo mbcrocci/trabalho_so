@@ -2,7 +2,7 @@
 Trabalho de Sistemas Operativos
 
 ### TODO
-- [ ] Authentication
+- [x] Authentication
 
 - [ ] Object model correcto
 - [ ] Monster model correcto
