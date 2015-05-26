@@ -31,6 +31,7 @@ int main (void)
 
 	// COMECAR POR AUTENTICAR USER
 	printf ("Username: "); fgets (username, sizeof (username), stdin);
+	fflush (stdin);
 	printf ("Password: "); fgets (password, sizeof (password), stdin);
 
 	strcpy (req.command, "AUTHENTICATE");
@@ -42,23 +43,13 @@ int main (void)
 	read (client_fd, &rep, sizeof (rep));
 	close (client_fd);
 
-	if (!strcmp (rep.buffer, "WRONG CREDENTIALS")) {
-		fprintf (stderr, "Usarname ou Password imcorrentos");
+	if (strcmp (rep.buffer, "AUTHENTICATED")) {
+		fprintf (stderr, "Usarname ou  Password imcorrentos\n");
 
 		close (server_fd);
 		unlink (req.endereco);
 		exit (EXIT_SUCCESS);
 	}
-
-	if (!strcmp (rep.buffer, "NO MORE USERS")) {
-		fprintf (stderr,"Impossivel ligar ao server,"
-				" este nao aceit a mais utilizadores\n");
-
-		close (server_fd);
-		unlink (req.endereco);
-		exit (EXIT_SUCCESS);
-	}
-
 
 	// clear buffers
 	memset (&req.command[0], 0, sizeof (req.command));
@@ -92,7 +83,7 @@ int main (void)
 			client_fd = open (req.endereco, O_RDONLY);
 
 			n = read (client_fd, &rep, sizeof (rep));
-			fprintf (stderr, "[READ] - Response %s .. (%d bytes)\n", rep.buffer, n);
+			fprintf (stderr, "[READ] -  %s .. (%d bytes)\n", rep.buffer, n);
 
 			close (client_fd);
 

@@ -25,10 +25,22 @@ int find_user (pid_t client_pid, user_t *user)
 	return 0;
 }
 
+user_t new_user (pid_t client_pid)
+{
+	object_t saco[10];
+	memset (&saco[0], 0, sizeof (object_t) *10); // esvaziar o saco de lixo
+
+	// (TODO): OBJECT MODEL IS NOT CORRECT
+
+	// (TODO): Corrigir valores de inicializao
+	return (user_t) {.client_pid = client_pid, .hp=20, .hp_max=30, .saco=saco};
+}
+
 int main (int argc, char *argv[])
 {
-	int n, i;
+	int n, i, n_user=0;
 	char response[BUFF_SIZE];
+	char username[10], password[10];
 
 	FILE *user_fp;
 
@@ -42,10 +54,14 @@ int main (int argc, char *argv[])
 		exit (EXIT_FAILURE);
 	}
 
-	user_fp = fopen (argv[1], "r");
+	// nao vale a penar continuar sem poder abrir o fichero
+	if ((user_fp = fopen (argv[1], "r")) == NULL) {
+		fprintf (stderr, "[ERRO] - Impossivel abrir o ficheiro: %s", argv[1]);
+		exit (EXIT_FAILURE);
+	}
 
 	if (access (SERVER_FIFO, F_OK) == 0) {
-		printf ("[ERRO] - Nao pode existir mais de um server\n");
+		fprintf (stderr, "[ERRO] - Nao pode existir mais de um server\n");
 		exit (EXIT_FAILURE);
 	}
 
@@ -82,12 +98,27 @@ int main (int argc, char *argv[])
 		printf ("[READ] Request from %d ... (%d bytes)\n",
 			req.client_pid, n);
 
-		//if (!strcmp ())
 
 		// HANDLE REQUEST
 		if (!strcmp (req.command, "hello")) {
 			sprintf (response, "Hello %d", req.client_pid);
 			strcpy (rep.buffer, response);
+
+		} else if (!strcmp (req.command, "AUTHENTICATE")) {
+			// (TODO): Ver se ja passou o timeout
+			while (fscanf (user_fp, "%s:%s", username, password) == 2) {
+				if (!strcmp (username, req.argument[0]) &&
+					!strcmp (password, req.argument[1])) {
+
+					strcpy(rep.buffer, "AUTHENTICATED");
+
+					// adicionar utilizador a lista
+					user_list[n_user] = new_user (req.client_pid);
+					n_user++;
+				break;
+				}
+			}
+			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
 		} else {
 			strcpy (rep.buffer, "Not a valid command");
 		}
