@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <signal.h>
-
 
 #include "util.h"
 
@@ -24,7 +16,7 @@ void trata_sig (int i)
 int main (int argc, char *argv[])
 {
 	int n;
-	char response[25];
+	char response[BUFF_SIZE];
 
 	FILE *user_f;
 
@@ -60,20 +52,24 @@ int main (int argc, char *argv[])
 	printf ("SERVER STARTED\n");
 
 	while (1) {
+		// clear buffers
+		memset (&req.buffer[0], 0, sizeof (req.buffer));
+		memset (&rep.buffer[0], 0, sizeof (rep.buffer));
+
 		// READ REQUEST
 		n = read (server_fd, &req, sizeof (req));
 		if (n < sizeof(req)) {
 			fprintf(stderr, "\nRequest imcompleto");
 			continue;
 		}
-		printf ("[SERVIDOR] Recebi pedido ... (%d bytes)\n", n);
+		printf ("[READ] Recebi pedido ... (%d bytes)\n", n);
 
 		// HANDLE REQUEST
-		if (!strcmp (req.str, "hello")) {
+		if (!strcmp (req.buffer, "hello")) {
 			sprintf (response, "Hello %s", req.endereco);
-			strcpy (rep.str, response);
+			strcpy (rep.buffer, response);
 		} else {
-			strcpy (rep.str, "Not a valid command");
+			strcpy (rep.buffer, "Not a valid command");
 		}
 
 		// SEND RESPONSE

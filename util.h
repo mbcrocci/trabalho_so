@@ -1,13 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #define SERVER_FIFO "server_fifo"
 #define CLIENT_FIFO "client_%d_fifo"
 
+#define BUFF_SIZE 25
+
 typedef struct {
-	char endereco[20];
-	char str[10];
+	char endereco[BUFF_SIZE];
+	char buffer[BUFF_SIZE];
 } request_t;
 
 typedef struct {
-	char str[25];
+	char buffer[BUFF_SIZE];
 } response_t;
 
 

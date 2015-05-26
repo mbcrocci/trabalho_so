@@ -1,16 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include "util.h"
 
 int main (void)
 {
-	char str[80], *word[8];
+	char str[BUFF_SIZE], *word[8];
 	int n, i, server_fd, client_fd;
 
 	request_t req;
@@ -36,7 +28,7 @@ int main (void)
 
 	do {
 		printf (">> ");
-		fgets (str, 80, stdin);
+		fgets (str, BUFF_SIZE, stdin);
 
 		str[strlen (str)-1] = '\0';
 		word[0] = strtok (str, " ");
@@ -48,7 +40,7 @@ int main (void)
 
 		if (word[0] != NULL) {
 			if (!strcmp (word[0], "hello"))
-				strcpy (req.str, "hello");
+				strcpy (req.buffer, "hello");
 
 			// send request
 			n = write (server_fd, &req, sizeof (req));
@@ -57,9 +49,13 @@ int main (void)
 			client_fd = open (req.endereco, O_RDONLY);
 
 			n = read (client_fd, &rep, sizeof (rep));
-			fprintf (stderr, "[READ] - Response %s .. (%d bytes)\n", rep.str, n);
+			fprintf (stderr, "[READ] - Response %s .. (%d bytes)\n", rep.buffer, n);
 
 			close (client_fd);
+
+			// clear buffers
+			memset (&req.buffer[0], 0, sizeof (req.buffer));
+			memset (&rep.buffer[0], 0, sizeof (rep.buffer));
 		}
 	} while (strcmp (str, "exit"));
 
