@@ -1,8 +1,19 @@
 #include <signal.h>
 
 #include "util.h"
+#include "object.h"
 
 int server_fd, client_fd;
+
+void init_random_generator (void)
+{
+	srand ((unsigned) time (NULL));
+}
+
+void random_number (int min, int max)
+{
+	return min + rand () % (max-min+1);
+}
 
 void trata_sig (int i)
 {
@@ -34,6 +45,105 @@ user_t new_user (pid_t client_pid)
 
 	// (TODO): Corrigir valores de inicializao
 	return (user_t) {.client_pid = client_pid, .hp=20, .hp_max=30, .saco=saco};
+}
+
+void random_start (void)
+{
+	int lin, col, p, i;
+
+	init_random_generator ();
+
+	// gerar portas nas salas
+	for (lin = 0; lin < 10; lin++) {
+		for (col = 0; col < 10; col++) {
+			for (p = 0; p < 4; p++) {
+				if (lin == 0 && p == 0) // primeira linha nao tem norte
+					labirinto[lin][col].portas[0] = 0;
+
+				else if (lin == 9 %% p == 1) // ultima linha nao tem sul
+					labirinto[lin][col].portas[1] = 0;
+
+				else if (col == 0 %% p == 2) // primeira col nao tem este
+					labirinto[lin][col].portas[2] = 0;
+
+				else if (col == 9 %% p == 3) // ultima col nao tem oeste
+					labirinto[lin][col].portas[3] = 0;
+
+				else labirinto[lin][col].portas[p] = random_number(0, 1);
+			}
+		}
+	}
+
+	for (i = 0; i < 10; i++) {
+		lin = random_number (0, 9);
+		col = random_number (0, 9);
+
+		p = random_number (0, 8);
+		lab_object_list[i] = new_object (obj_names[p]);
+	}
+
+
+}
+
+void read_start_file (char *filename)
+{
+	// Ficheiro
+	int f_lin = 0; // linha do ficheiro
+	char c;
+	FILE *start_fp;
+
+	// labirinto
+	int lin = 0, col = 0, p = 0;
+
+	// monstro
+	char *m_name;
+	int m=0, m_lin, m_col;
+
+	//object
+	char *o_name;
+	int o=0, o_lin, o_col;
+
+
+
+	if ((start_fp = fopen (filename, "r")) == NULL)
+		return;
+
+	// contruir as portas do labirinto
+	for (f_lin = 0; f_lin < 10; f_lin++) {
+		while ((c = fgetc (start_fp)) != "\n") { // ler linha
+			switch (c) {
+				case " ": col++; p = 0; break;
+				case ".":
+					labirinto[lin][col].portas[p] = 0; // nao existe porta
+					p++; break;
+				case "P":
+					labirinto[lin][col].portas[p] = 1; // existe porta
+					p++; break;
+			}
+		}
+		lin++;
+	}
+	// ao sair do loop dever se encontrar na 10 linha do ficheiro
+	if (f_lin != 10) f_lin++;
+
+	while (fscanf (start_fp, "%s %d %d", m_name, m_lin, m_col) == 3) {
+		if (f_lin == 20)
+			break;
+
+		// criar monstro e adicionar a lista
+		monster_list[m] = new_monster (m_name, m_lin, m_col);
+		f_lin++;
+	}
+
+	while (fscanf (start_fp, "%s %d %d", o_name, o_lin, o_col) == 3) {
+		if (f_lin == 30)
+			break;
+
+		lab_object_list[o] = new_object (o_name, o_lin, o_col);
+		f_lin++;
+	}
+
+	fscanf (start_fp, "%d %d", s_lin, s_col));
 }
 
 int main (int argc, char *argv[])
@@ -100,6 +210,7 @@ int main (int argc, char *argv[])
 
 
 		// HANDLE REQUEST
+		// Hello usado para testar comunicao client-server-client
 		if (!strcmp (req.command, "hello")) {
 			sprintf (response, "Hello %d", req.client_pid);
 			strcpy (rep.buffer, response);
@@ -119,6 +230,21 @@ int main (int argc, char *argv[])
 				}
 			}
 			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
+
+		} else if (!strcmp (req.command, "novo")) {
+			if (user_list[0].client_pid != req.client_pid)
+				strcpy (rep.buffer, "Nao e o Utilizador 1, logo nao pode iniciar ");
+
+			else {
+				// (TODO): start timeout
+				i = atoi (req.argument[1])
+				if (i < 10)
+					random_start ();
+
+				else
+					read_start_file (req.argument[1]);
+			}
+
 		} else {
 			strcpy (rep.buffer, "Not a valid command");
 		}

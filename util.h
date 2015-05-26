@@ -24,16 +24,7 @@ typedef struct {
 } response_t;
 
 
-typedef struct {
-	char nome[10];
-	float peso;
-	int raridade, f_ataque, f_defesa, max_uso;
-	int hp_diff, def_diff; // "Quando usado" e "Quando Equipado" respct.
-	int lin, col;
-} object_t;
-
 #define PESO_MAX 20
-
 #define MAX_USERS 10
 typedef struct {
 	pid_t client_pid; //  Used to find from the request sent from client
@@ -57,3 +48,6 @@ typedef struct {
 	int lin, col;
 	int hp; // max 100
 } monstro_t;
+
+// lista de monstros
+monstro_t monster_list[MAX_N_MONTROS];

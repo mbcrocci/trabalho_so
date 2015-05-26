@@ -2,14 +2,14 @@
 Trabalho de Sistemas Operativos
 
 ### TODO
-- [x] Authentication
+- [ ] Authentication
 
-- [ ] Object model correcto
+- [x] Object model correcto
 - [ ] Monster model correcto
 
 - [ ] "Poderes" para o utilizador 1
 - [ ] Inicializar labirinto aleatoriamente
-- [ ] Inicializar labirinto atraves de ficheiro
+- [x] Inicializar labirinto atraves de ficheiro
 - [ ] Juntar ao jogo (utilizador 2+)
 
 - [ ] Terminar jogo

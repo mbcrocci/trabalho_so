@@ -76,6 +76,12 @@ int main (void)
 			if (!strcmp (word[0], "hello"))
 				strcpy (req.command, "hello");
 
+			if (!strcmp (word[0], "novo")) {
+				strcpy (req.command, "novo");
+				strcpy (req.argument[0], word[1]) // timeout
+				strcpy (req.argument[1], word[2]) // dificuldade ou ficheiro
+			}
+
 			// send request
 			n = write (server_fd, &req, sizeof (req));
 			fprintf (stderr, "[WRITE] - Sent request .. (%d bytes)\n", n);
