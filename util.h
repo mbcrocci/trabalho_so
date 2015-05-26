@@ -13,7 +13,10 @@
 
 typedef struct {
 	char endereco[BUFF_SIZE];
-	char buffer[BUFF_SIZE];
+	pid_t client_pid;
+
+	char command[BUFF_SIZE]; // comando principal: novo, atacar, mover, etc
+	char argument[3][BUFF_SIZE]; // argumentos para o comando principal
 } request_t;
 
 typedef struct {
@@ -28,12 +31,13 @@ typedef struct {
 
 #define MAX_USERS 10
 typedef struct {
+	pid_t client_pid; //  Used to find from the request sent from client
 	int username;
 	int hp, hp_max;
-	object_t saco[10];
+	//object_t saco[10];
 } user_t;
 
-user_t *user_list;
+user_t user_list[MAX_USERS];
 
 #define MAX_N_SALAS 10
 typedef struct {

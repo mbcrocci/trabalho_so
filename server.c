@@ -13,12 +13,24 @@ void trata_sig (int i)
 	exit (EXIT_SUCCESS);
 }
 
+user_t find_user (pit_t client_pid)
+{
+	int i;
+	for (i = 0; i < MAX_USERS; i++)
+		if (client_pid == user_list[i].client_pid)
+			return user_list[i];
+
+	return NULL;
+}
+
 int main (int argc, char *argv[])
 {
 	int n;
 	char response[BUFF_SIZE];
 
-	FILE *user_f;
+	FILE *user_fp;
+
+	user_t curr_user;
 
 	request_t req;
 	response_t rep;
@@ -28,7 +40,7 @@ int main (int argc, char *argv[])
 		exit (EXIT_FAILURE);
 	}
 
-	// user_f = open() // abrir ficheiros com utilizadors e passwords
+	user_fp = open (argv[1], 'r');
 
 	if (access (SERVER_FIFO, F_OK) == 0) {
 		printf ("[ERRO] - Nao pode existir mais de um server\n");
@@ -53,8 +65,10 @@ int main (int argc, char *argv[])
 
 	while (1) {
 		// clear buffers
-		memset (&req.buffer[0], 0, sizeof (req.buffer));
-		memset (&rep.buffer[0], 0, sizeof (rep.buffer));
+		memset (&req.command[0], 0, sizeof (req.buffer));
+		for (i = 0; i < 3; i++)
+			memset (&rep.arguement[i][0], 0, sizeof (rep.buffer));
+
 
 		// READ REQUEST
 		n = read (server_fd, &req, sizeof (req));
@@ -62,11 +76,14 @@ int main (int argc, char *argv[])
 			fprintf(stderr, "\nRequest imcompleto");
 			continue;
 		}
-		printf ("[READ] Recebi pedido ... (%d bytes)\n", n);
+		printf ("[READ] Request from %d ... (%d bytes)\n",
+			req.client_pid, n);
+
+		if (!strcmp ())
 
 		// HANDLE REQUEST
 		if (!strcmp (req.buffer, "hello")) {
-			sprintf (response, "Hello %s", req.endereco);
+			sprintf (response, "Hello %d", req.client_pid);
 			strcpy (rep.buffer, response);
 		} else {
 			strcpy (rep.buffer, "Not a valid command");

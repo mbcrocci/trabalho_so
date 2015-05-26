@@ -2,7 +2,9 @@
 
 int main (void)
 {
-	char str[BUFF_SIZE], *word[8];
+	char str[BUFF_SIZE], *word[8]; // shell
+	char username[10], password[10];
+
 	int n, i, server_fd, client_fd;
 
 	request_t req;
@@ -13,7 +15,8 @@ int main (void)
 		exit (1);
 	}
 
-	sprintf (req.endereco, CLIENT_FIFO, getpid());
+	req.client_pid = getpid ();
+	sprintf (req.endereco, CLIENT_FIFO, getpid ());
 	if (mkfifo (req.endereco, 0600)) {
 		perror ("\n[ERRO] mkfifo FIFO client");
 		exit (EXIT_FAILURE);
@@ -25,6 +28,42 @@ int main (void)
 		unlink (req.endereco);
 		exit (EXIT_FAILURE);
 	}
+
+	// COMECAR POR AUTENTICAR USER
+	printf ("Username: "); fgets (username, sizeof (username), stdin);
+	printf ("Password: "); fgets (password, sizeof (password), stdin);
+
+	strcpy (req.command, "AUTHENTICATE");
+	strcpy (req.argument[0], username);
+	strcpy (req.argument[1], password);
+
+	write (server_fd, &req, sizeof (req));
+	client_fd = open (req.endereco, O_RDONLY);
+	read (client_fd, &rep, sizeof (rep));
+	close (client_fd);
+
+	if (!strcmp (rep.buffer, "WRONG CREDENTIALS")) {
+		fprintf (stderr, "Usarname ou Password imcorrentos")
+
+		close (server_fd);
+		unlink (req.endereco);
+		exit (EXIT_SUCCESS);
+	}
+
+	if (!strcmp (rep.buffer, "NO MORE USERS")) {
+		fprintf (stderr,"Impossivel ligar ao server,"
+				" este nao aceit a mais utilizadores\n");
+
+		close (server_fd);
+		unlink (req.endereco);
+		exit (EXIT_SUCCESS);
+	}
+
+
+	// clear buffers
+	memset (&req.command[0], 0, sizeof (req.buffer));
+	for (i = 0; i < 3; i++)
+		memset (&rep.arguement[i][0], 0, sizeof (rep.buffer));
 
 	do {
 		printf (">> ");
@@ -39,8 +78,11 @@ int main (void)
 		} while (word[i] != NULL);
 
 		if (word[0] != NULL) {
+			if (!strcmp word[0], "exit")
+				break;
+
 			if (!strcmp (word[0], "hello"))
-				strcpy (req.buffer, "hello");
+				strcpy (req.command, "hello");
 
 			// send request
 			n = write (server_fd, &req, sizeof (req));
