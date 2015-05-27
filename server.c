@@ -66,7 +66,7 @@ object_t new_object (char *name, int lin, int col)
 	nome[9] = 0;
 
 	if (!strcmp ("sandes", name))
-		return (object_t) { (int) nome, 0.5, 10, 0, 0, 1, 3, 0, lin, col };
+		return (object_t) { *nome, 0.5, 10, 0, 0, 1, 3, 0, lin, col };
 
 	if (!strcmp ("aspirina", name))
 		return (object_t) {
@@ -198,6 +198,7 @@ void read_start_file (char *filename)
 					p++; break;
 			}
 		}
+		col = 0 ;
 		lin++;
 	}
 	// ao sair do loop dever se encontrar na 10 linha do ficheiro
