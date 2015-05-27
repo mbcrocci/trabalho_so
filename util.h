@@ -12,6 +12,7 @@
 #define CLIENT_FIFO "client_%d_fifo"
 
 #define BUFF_SIZE 25
+#define REP_BUFF_SIZE 100
 
 typedef struct {
 	char endereco[BUFF_SIZE];
@@ -22,7 +23,7 @@ typedef struct {
 } request_t;
 
 typedef struct {
-	char buffer[BUFF_SIZE];
+	char buffer[REP_BUFF_SIZE];
 } response_t;
 
 

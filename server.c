@@ -52,13 +52,77 @@ user_t new_user (pid_t client_pid)
 	//(TODO): resolver WARNING -> saco
 
 	return (user_t) {.client_pid=client_pid, .hp=20, .hp_max=30,
-					 .saco=saco, .peso_saco=peso,
+					 .saco=*saco, .peso_saco=peso,
 					 .lin=s_inic_lin, .col=s_inic_col };
 }
+
+
+object_t new_object (char *name, int lin, int col)
+{
+	int i;
+	char nome[10];
+
+	memcpy (nome, name, 10);
+	nome[9] = 0;
+
+	if (!strcmp ("sandes", name))
+		return (object_t) { (int) nome, 0.5, 10, 0, 0, 1, 3, 0, lin, col };
+
+	if (!strcmp ("aspirina", name))
+		return (object_t) {
+			*nome, .peso=0.1, .raridade=20,
+			.f_ataque=0, .f_defesa=0, .max_uso=1,
+			.hp_diff=1, .def_diff=0, .lin=lin, .col=col
+		};
+
+	if (!strcmp ("xarope", name))
+		return (object_t) {
+			*nome, .peso=1, .raridade=4,
+			.f_ataque=0, .f_defesa=0, .max_uso=1,
+			.hp_diff=4, .def_diff=0, .lin=lin, .col=col
+		};
+
+	if (!strcmp ("faca", name))
+		return (object_t) {
+			*nome, .peso=2, .raridade=5,
+			.f_ataque=5, .f_defesa=0, .max_uso=0,
+			.hp_diff=0, .def_diff=0, .lin=lin, .col=col
+		};
+
+	if (!strcmp ("espada", name))
+		return (object_t) {
+			*nome, .peso=8, .raridade=3,
+			.f_ataque=8, .f_defesa=2, .max_uso=0,
+			.hp_diff=0, .def_diff=2, .lin=lin, .col=col
+		};
+
+	if (!strcmp ("granada", name))
+		return (object_t) {
+			*nome, .peso=1, .raridade=2,
+			.f_ataque=30, .f_defesa=0, .max_uso=1,
+			.hp_diff=-5, .def_diff=0, .lin=lin, .col=col
+		};
+
+	if (!strcmp ("escudo", name))
+		return (object_t) {
+			*nome, .peso=4, .raridade=4,
+			.f_ataque=5, .f_defesa=0, .max_uso=0,
+			.hp_diff=0, .def_diff=5, .lin=lin, .col=col
+		};
+
+	if (!strcmp ("moeda", name))
+		return (object_t) {
+			*nome, .peso=0.1, .raridade=5,
+			.f_ataque=0, .f_defesa=0, .max_uso=0,
+			.hp_diff=0, .def_diff=0, .lin=lin, .col=col
+		};
+}
+
 
 void random_start (void)
 {
 	int lin, col, p, i;
+	char obj_name[10];
 
 	init_random_generator ();
 
@@ -83,17 +147,21 @@ void random_start (void)
 		}
 	}
 
+	// random sala inicial
+	s_inic_lin = random_number (0, 9);
+	s_inic_col = random_number (0, 9);
+
 	for (i = 0; i < 10; i++) {
 		// random sala
-		s_inic_lin = random_number (0, 9);
-		s_inic_col = random_number (0, 9);
+		lin = random_number (0, 9);
+		col = random_number (0, 9);
 
 		// random object
-		p = random_number (0, 8);
-		lab_object_list[i] = new_object (*obj_names[p], lin, col);
+		p = random_number (0, 7);
+		strcpy (obj_name, obj_names[p]);
+
+		lab_object_list[i] = new_object (obj_name, lin, col);
 	}
-
-
 }
 
 void read_start_file (char *filename)
@@ -160,10 +228,13 @@ void read_start_file (char *filename)
 int main (int argc, char *argv[])
 {
 	int n, i, n_user=0;
-	char response[BUFF_SIZE];
+	char response[REP_BUFF_SIZE];
 	char username[10], password[10];
+	char line[20];
 
 	FILE *user_fp;
+
+	int self_fifo;
 
 	user_t curr_user;
 
@@ -197,6 +268,8 @@ int main (int argc, char *argv[])
 		perror ("\n[ERRO] - Impossivel abrir fifo do server");
 		exit (EXIT_FAILURE);
 	}
+	//manter ligado
+	self_fifo = open(SERVER_FIFO, O_WRONLY);
 
 	printf ("SERVER STARTED\n");
 	while (1) {
@@ -225,18 +298,21 @@ int main (int argc, char *argv[])
 
 		} else if (!strcmp (req.command, "AUTHENTICATE")) {
 			// (TODO): Ver se ja passou o timeout
-			while (fscanf (user_fp, "%s:%s", username, password) == 2) {
-				if (!strcmp (username, req.argument[0]) &&
-					!strcmp (password, req.argument[1])) {
+			// (TODO): ler fichereiro correctamente
 
-					strcpy(rep.buffer, "AUTHENTICATED");
+			//if (!strcmp (username, req.argument[0]) &&
+			//	!strcmp (password, req.argument[1])) {
 
-					// adicionar utilizador a lista
-					user_list[n_user] = new_user (req.client_pid);
-					n_user++;
-				break;
-				}
-			}
+				strcpy(rep.buffer, "AUTHENTICATED");
+
+				// adicionar utilizador a lista
+				user_list[n_user] = new_user (req.client_pid);
+
+				printf ("[SERVIDOR] - Novo jogador [%s] conhecido por"
+						" [jogador %d]\n", req.argument[0], n_user);
+				n_user++;
+
+
 			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
 
 		} else if (!strcmp (req.command, "novo")) {
@@ -245,7 +321,7 @@ int main (int argc, char *argv[])
 
 			else {
 				// (TODO): start timeout
-				i = atoi (req.argument[1]);
+				i = atoi (req.argument[1]); // esta a converter bem
 				if (i < 10)
 					random_start ();
 
@@ -268,6 +344,7 @@ int main (int argc, char *argv[])
 		}
 	}
 
+	fclose (user_fp);
 	close (server_fd);
 	unlink (SERVER_FIFO);
 	return 0;

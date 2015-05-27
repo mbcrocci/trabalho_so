@@ -34,6 +34,10 @@ int main (void)
 	fflush (stdin);
 	printf ("Password: "); fgets (password, sizeof (password), stdin);
 
+	// remover os \n
+	strtok (username, "\n");
+	strtok (password, "\n");
+
 	strcpy (req.command, "AUTHENTICATE");
 	strcpy (req.argument[0], username);
 	strcpy (req.argument[1], password);
@@ -44,7 +48,7 @@ int main (void)
 	close (client_fd);
 
 	if (strcmp (rep.buffer, "AUTHENTICATED")) {
-		fprintf (stderr, "Usarname ou  Password incorretos\n");
+		fprintf (stderr, "Username ou  Password incorretos\n");
 
 		close (server_fd);
 		unlink (req.endereco);
@@ -78,8 +82,8 @@ int main (void)
 
 			if (!strcmp (word[0], "novo")) {
 				strcpy (req.command, "novo");
-				strcpy (req.argument[0], word[1]) // timeout
-				strcpy (req.argument[1], word[2]) // dificuldade ou ficheiro
+				strcpy (req.argument[0], word[1]); // timeout
+				strcpy (req.argument[1], word[2]); // dificuldade ou ficheiro
 			}
 
 			// send request
