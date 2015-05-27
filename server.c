@@ -1,16 +1,17 @@
 #include <signal.h>
+#include <time.h>
 
 #include "util.h"
-#include "object.h"
 
 int server_fd, client_fd;
+int s_inic_lin, s_inic_col;
 
 void init_random_generator (void)
 {
 	srand ((unsigned) time (NULL));
 }
 
-void random_number (int min, int max)
+int random_number (int min, int max)
 {
 	return min + rand () % (max-min+1);
 }
@@ -38,13 +39,21 @@ int find_user (pid_t client_pid, user_t *user)
 
 user_t new_user (pid_t client_pid)
 {
+	float peso;
 	object_t saco[10];
 	memset (&saco[0], 0, sizeof (object_t) *10); // esvaziar o saco de lixo
 
-	// (TODO): OBJECT MODEL IS NOT CORRECT
+	// (TODO): o object tem a mesma lin, col que user
+	saco[0] = new_object ("aspirina", 0, 0);
+	saco[1] = new_object ("faca", 0, 0);
 
-	// (TODO): Corrigir valores de inicializao
-	return (user_t) {.client_pid = client_pid, .hp=20, .hp_max=30, .saco=saco};
+	peso = saco[0].peso + saco[1].peso;
+
+	//(TODO): resolver WARNING -> saco
+
+	return (user_t) {.client_pid=client_pid, .hp=20, .hp_max=30,
+					 .saco=saco, .peso_saco=peso,
+					 .lin=s_inic_lin, .col=s_inic_col };
 }
 
 void random_start (void)
@@ -60,13 +69,13 @@ void random_start (void)
 				if (lin == 0 && p == 0) // primeira linha nao tem norte
 					labirinto[lin][col].portas[0] = 0;
 
-				else if (lin == 9 %% p == 1) // ultima linha nao tem sul
+				else if (lin == 9 && p == 1) // ultima linha nao tem sul
 					labirinto[lin][col].portas[1] = 0;
 
-				else if (col == 0 %% p == 2) // primeira col nao tem este
+				else if (col == 0 && p == 2) // primeira col nao tem este
 					labirinto[lin][col].portas[2] = 0;
 
-				else if (col == 9 %% p == 3) // ultima col nao tem oeste
+				else if (col == 9 && p == 3) // ultima col nao tem oeste
 					labirinto[lin][col].portas[3] = 0;
 
 				else labirinto[lin][col].portas[p] = random_number(0, 1);
@@ -75,11 +84,13 @@ void random_start (void)
 	}
 
 	for (i = 0; i < 10; i++) {
-		lin = random_number (0, 9);
-		col = random_number (0, 9);
+		// random sala
+		s_inic_lin = random_number (0, 9);
+		s_inic_col = random_number (0, 9);
 
+		// random object
 		p = random_number (0, 8);
-		lab_object_list[i] = new_object (obj_names[p]);
+		lab_object_list[i] = new_object (*obj_names[p], lin, col);
 	}
 
 
@@ -103,20 +114,18 @@ void read_start_file (char *filename)
 	char *o_name;
 	int o=0, o_lin, o_col;
 
-
-
 	if ((start_fp = fopen (filename, "r")) == NULL)
 		return;
 
 	// contruir as portas do labirinto
 	for (f_lin = 0; f_lin < 10; f_lin++) {
-		while ((c = fgetc (start_fp)) != "\n") { // ler linha
+		while ((c = fgetc (start_fp)) != '\n') { // ler linha
 			switch (c) {
-				case " ": col++; p = 0; break;
-				case ".":
+				case ' ': col++; p = 0; break;
+				case '.':
 					labirinto[lin][col].portas[p] = 0; // nao existe porta
 					p++; break;
-				case "P":
+				case 'P':
 					labirinto[lin][col].portas[p] = 1; // existe porta
 					p++; break;
 			}
@@ -126,16 +135,16 @@ void read_start_file (char *filename)
 	// ao sair do loop dever se encontrar na 10 linha do ficheiro
 	if (f_lin != 10) f_lin++;
 
-	while (fscanf (start_fp, "%s %d %d", m_name, m_lin, m_col) == 3) {
+	while (fscanf (start_fp, "%s %d %d", m_name, &m_lin, &m_col) == 3) {
 		if (f_lin == 20)
 			break;
 
 		// criar monstro e adicionar a lista
-		monster_list[m] = new_monster (m_name, m_lin, m_col);
+		//monster_list[m] = new_monster (m_name, m_lin, m_col);
 		f_lin++;
 	}
 
-	while (fscanf (start_fp, "%s %d %d", o_name, o_lin, o_col) == 3) {
+	while (fscanf (start_fp, "%s %d %d", o_name, &o_lin, &o_col) == 3) {
 		if (f_lin == 30)
 			break;
 
@@ -143,7 +152,9 @@ void read_start_file (char *filename)
 		f_lin++;
 	}
 
-	fscanf (start_fp, "%d %d", s_lin, s_col));
+	fscanf (start_fp, "%d %d", &s_inic_lin, &s_inic_col);
+
+	fclose (start_fp);
 }
 
 int main (int argc, char *argv[])
@@ -187,10 +198,7 @@ int main (int argc, char *argv[])
 		exit (EXIT_FAILURE);
 	}
 
-	// Fazer labirinto
-
 	printf ("SERVER STARTED\n");
-
 	while (1) {
 		// clear buffers
 		memset (&req.command[0], 0, sizeof (req.command));
@@ -237,7 +245,7 @@ int main (int argc, char *argv[])
 
 			else {
 				// (TODO): start timeout
-				i = atoi (req.argument[1])
+				i = atoi (req.argument[1]);
 				if (i < 10)
 					random_start ();
 

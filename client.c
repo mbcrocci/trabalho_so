@@ -44,7 +44,7 @@ int main (void)
 	close (client_fd);
 
 	if (strcmp (rep.buffer, "AUTHENTICATED")) {
-		fprintf (stderr, "Usarname ou  Password imcorrentos\n");
+		fprintf (stderr, "Usarname ou  Password incorretos\n");
 
 		close (server_fd);
 		unlink (req.endereco);

@@ -10,7 +10,7 @@ typedef struct {
 object_t lab_object_list[10];
 
 // funcoes de objectos
-object_t new_object (char *);
+object_t new_object (char *, int, int);
 
 char *obj_names[8][10] = {
 	"sandes", "aspirina", "xarope", "faca",

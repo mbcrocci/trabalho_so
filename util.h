@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "object.h"
+
 #define SERVER_FIFO "server_fifo"
 #define CLIENT_FIFO "client_%d_fifo"
 
@@ -30,6 +32,9 @@ typedef struct {
 	pid_t client_pid; //  Used to find from the request sent from client
 	int hp, hp_max;
 	object_t saco[10];
+	float peso_saco;
+
+	int lin, col;
 } user_t;
 
 user_t user_list[MAX_USERS];
