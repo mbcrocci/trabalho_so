@@ -25,18 +25,6 @@ void trata_sig (int i)
 	exit (EXIT_SUCCESS);
 }
 
-int find_user (pid_t client_pid, user_t *user)
-{
-	int i;
-	for (i = 0; i < MAX_USERS; i++)
-		if (client_pid == user_list[i].client_pid) {
-			*user = user_list[i];
-			return 1;
-		}
-
-	return 0;
-}
-
 user_t new_user (pid_t client_pid)
 {
 	float peso;
@@ -54,6 +42,22 @@ user_t new_user (pid_t client_pid)
 	return (user_t) {.client_pid=client_pid, .hp=20, .hp_max=30,
 					 .saco=*saco, .peso_saco=peso,
 					 .lin=s_inic_lin, .col=s_inic_col };
+}
+
+void remove_user (pid_t client_pid)
+{
+	int i, j;
+
+	// encontrar o utilizador a remover
+	for (i = 0; i < MAX_USERS; i++)
+		if (client_pid == user_list[i].client_pid)
+			break;
+
+	for (j = i; j < MAX_USERS-1; i++)
+		user_list[j] = user_list[j+1];
+
+	// asegurar que o ultimo ultilzador nao repete ao final do vector
+	memset (&user_list[MAX_USERS-1], 0, sizeof (user_t));
 }
 
 
@@ -118,6 +122,53 @@ object_t new_object (char *name, int lin, int col)
 		};
 }
 
+monstro_t new_monster(char *nome, int lin, int col){
+	int a,d,s;
+	if(!strcmp ("morcego", nome)){
+		a = random_number(1,4);
+		d = random_number(3,4);
+		s = random_numer(4,5);
+		return (monstro_t){
+			*nome, .ataque=a, .defesa=d,.hp=s,.agress=1,.estado=0;
+		};
+	}
+
+	if(!strcmp ("escorpiao", nome)){
+		a = random_number(1,7);
+		d = random_number(5,7);
+		s = random_numer(7,9);
+		return (monstro_t){
+			*nome, .ataque=a, .defesa=d,.hp=s,.agress=1,.estado=1;
+		};
+	}
+
+	if(!strcmp ("lobisomem", nome)){
+		a = random_number(5,7);
+		d = random_number(5,7);
+		s = random_numer(7,9);
+
+		return (monstro_t){
+			*nome, .ataque=a, .defesa=d,.hp=s,.agress=1,.estado=0;
+		};
+	}
+
+	if(!strcmp ("urso", nome)){
+		a = random_number(8,10);
+		d = random_number(10,12);
+
+		return (monstro_t){
+			*nome, .ataque=a, .defesa=d,.hp=10,.agress=0,.estado=1;
+		};
+	}
+
+	if(!strcmp ("boss", nome)){
+		a = random_number(10,12);
+
+		return (monstro_t){
+			*nome, .ataque=a, .defesa=15,.hp=15,.agress=0,.estado=1;
+		};
+	}
+}
 
 void random_start (void)
 {
@@ -293,9 +344,9 @@ int main (int argc, char *argv[])
 
 		// HANDLE REQUEST
 		// Hello usado para testar comunicao client-server-client
-		if (!strcmp (req.command, "hello")) {
-			sprintf (response, "Hello %d", req.client_pid);
-			strcpy (rep.buffer, response);
+		if (!strcmp (req.command, "logout")) {
+			strcpy (rep.buffer, "Goodbye!!");
+			remove_user (req.client_pid);
 
 		} else if (!strcmp (req.command, "AUTHENTICATE")) {
 			// (TODO): Ver se ja passou o timeout

@@ -48,12 +48,24 @@ typedef struct {
 
 sala labirinto[10][10];
 
-#define MAX_N_MONTROS 10
+#define MAX_N_MONTROS 27
 typedef struct {
-	char *nome;
+	char nome [10];
 	int lin, col;
-	int hp; // max 100
+	int atac,def;// valores de ataque e de defesa (variam)
+	int hp;//vida do monstro
+	int agress; //agressivo=1 ou passivo=0
+	int estado;// quieto=1 ou irrequieto=0
+	object_t loot; // max 100
 } monstro_t;
 
 // lista de monstros
 monstro_t monster_list[MAX_N_MONTROS];
+
+
+char sala_desc[25][20] = {
+	"sala baixa","corredor baixo", "corredor apertado", "sala fria",
+	"sala alta", "corredor ventoso" , "sala escura",
+	"corredor escorregadio" "sala humida", "corredor molhado",
+	"sala estreita", "corredor lamacento", "sala quente"
+};

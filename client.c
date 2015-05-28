@@ -74,8 +74,8 @@ int main (void)
 		} while (word[i] != NULL);
 
 		if (word[0] != NULL) {
-			if (!strcmp (word[0], "exit"))
-				break;
+			if (!strcmp (word[0], "logout"))
+				strcpy (req.command, "logout");
 
 			if (!strcmp (word[0], "hello"))
 				strcpy (req.command, "hello");
@@ -104,7 +104,7 @@ int main (void)
 			memset (&rep.buffer[0], 0, sizeof (rep.buffer));
 
 		}
-	} while (strcmp (str, "exit"));
+	} while (strcmp (str, "logout"));
 
 	close (server_fd);
 	unlink (req.endereco);
