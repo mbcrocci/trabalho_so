@@ -55,13 +55,15 @@ int main (void)
 		exit (EXIT_SUCCESS);
 	}
 
-	// clear buffers
-	memset (&req.command[0], 0, sizeof (req.command));
-	for (i = 0; i < 3; i++)
-		memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
-	memset (&rep.buffer[0], 0, sizeof (rep.buffer));
-
 	do {
+
+			// clear buffers
+		memset (&req.command[0], 0, sizeof (req.command));
+		for (i = 0; i < 3; i++)
+			memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
+		memset (&rep.buffer[0], 0, sizeof (rep.buffer));
+
+
 		printf (">> ");
 		fgets (str, BUFF_SIZE, stdin);
 
@@ -88,21 +90,17 @@ int main (void)
 
 			// send request
 			n = write (server_fd, &req, sizeof (req));
-			fprintf (stderr, "[WRITE] - Sent request .. (%d bytes)\n", n);
 
 			client_fd = open (req.endereco, O_RDONLY);
 
 			n = read (client_fd, &rep, sizeof (rep));
-			fprintf (stderr, "[READ] -  %s .. (%d bytes)\n", rep.buffer, n);
+			fprintf (stderr,"\n%s\n", rep.buffer);
 
 			close (client_fd);
 
-			// clear buffers
-			memset (&req.command[0], 0, sizeof (req.command));
-			for (i = 0; i < 3; i++)
-				memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
-			memset (&rep.buffer[0], 0, sizeof (rep.buffer));
-
+			// Handle LOGOUT (por algum motivo nao esta a sair normalmente)
+			if (!strcmp (rep.buffer, "LOGOUT"))
+				break;
 		}
 	} while (strcmp (str, "logout"));
 

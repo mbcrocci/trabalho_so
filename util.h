@@ -45,6 +45,9 @@ user_t users_playing[MAX_USERS];
 typedef struct {
 	int portas[4]; // 0-norte, 1-sul, 2-este, 3-oeste
 	char descricao[100];
+
+	int n_obj; // usado para saber quantos objectos existem na sala
+	object_t ojectos[5];
 } sala;
 
 sala labirinto[10][10];
@@ -52,11 +55,12 @@ sala labirinto[10][10];
 #define MAX_N_MONTROS 27
 typedef struct {
 	char nome [10];
-	int atac, def;// valores de ataque e de defesa (variam)
-	int hp;//vida do monstro
-	int agress; //agressivo=1 ou passivo=0
-	int estado;// quieto=1 ou irrequieto=0
-	object_t loot; // max 100
+	int atac, def; // valores de ataque e de defesa (variam)
+	int hp;		   // vida do monstro
+	int agress;	   // agressivo=1 ou passivo=0
+	int estado;    // quieto=1 ou irrequieto=0
+	object_t loot[5]; // 5 pq p boss larga 5 moedas
+
 	int lin, col;
 } monstro_t;
 
@@ -65,8 +69,8 @@ monstro_t monster_list[MAX_N_MONTROS];
 
 
 char sala_desc[25][30] = {
-	"sala baixa","corredor baixo", "corredor apertado", "sala fria",
-	"sala alta", "corredor ventoso" , "sala escura",
-	"corredor escorregadio", "sala humida", "corredor molhado",
-	"sala estreita", "corredor lamacento", "sala quente"
+	"baixa","com corredor baixo", "com corredor apertado", "fria",
+	"alta", "com corredor ventoso" , "escura",
+	"com corredor escorregadio", "humida", "com corredor molhado",
+	"estreita", "com corredor lamacento", "quente"
 };

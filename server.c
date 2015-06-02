@@ -16,6 +16,23 @@ int random_number (int min, int max)
 	return min + rand () % (max-min+1);
 }
 
+// (TODO): APAGAR DEPOIS
+void show_user_list (void)
+{
+	int i;
+	printf ("\n[USER LIST]");
+	for (i = 0; i < MAX_USERS; i++)
+		if (user_list[i].client_pid != 0)
+			printf (" %d", user_list[i].client_pid);
+
+	printf ("\n[USERS PLAYING] ");
+	for (i = 0; i < MAX_USERS; i++)
+		if (users_playing[i].client_pid != 0)
+			printf (" %d", users_playing[i].client_pid);
+
+	printf ("\n");
+}
+
 void trata_sig (int i)
 {
 	fprintf (stderr, "\nSERVER TERMINATING\n");
@@ -43,17 +60,23 @@ user_t new_user (pid_t client_pid)
 					 .saco=*saco, .peso_saco=peso,
 					 .lin=s_inic_lin, .col=s_inic_col };
 }
+user_t find_user (pid_t client_pid)
+{
+	int i;
+	for (i = 0; i < MAX_USERS; i++)
+		if (user_list[i].client_pid == client_pid)
+			return user_list[i];
+}
 
 void remove_user (pid_t client_pid)
 {
 	int i, j;
-
 	// encontrar o utilizador a remover
 	for (i = 0; i < MAX_USERS; i++)
 		if (client_pid == user_list[i].client_pid)
 			break;
 
-	for (j = i; j < MAX_USERS-1; i++)
+	for (j = i; j < MAX_USERS-1; j++)
 		user_list[j] = user_list[j+1];
 
 	// asegurar que o ultimo ultilzador nao repete ao final do vector
@@ -63,7 +86,6 @@ void remove_user (pid_t client_pid)
 
 object_t new_object (char *name, int lin, int col)
 {
-	int i;
 	char nome[10];
 
 	memcpy (nome, name, 10);
@@ -129,6 +151,7 @@ object_t new_object (char *name, int lin, int col)
 monstro_t new_monster(char *nome, int lin, int col)
 {
 	int a,d,s;
+	object_t loot[5];
 
 	if(!strcmp ("morcego", nome)){
 		a = random_number (1,4);
@@ -144,9 +167,10 @@ monstro_t new_monster(char *nome, int lin, int col)
 		a = random_number(1,7);
 		d = random_number(5,7);
 		s = random_number (7,9);
+		loot[0] = new_object ("moeda", lin, col);
 		return (monstro_t){
 			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=1,
-			.lin=lin, .col=col
+			.loot=*loot, .lin=lin, .col=col
 		};
 	}
 
@@ -154,29 +178,37 @@ monstro_t new_monster(char *nome, int lin, int col)
 		a = random_number  (5,7);
 		d = random_number (5,7);
 		s = random_number (7,9);
+		loot[0] = new_object ("faca", lin, col);
 
 		return (monstro_t){
 			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
-			.lin=lin, .col=col
+			.loot=*loot, .lin=lin, .col=col
 		};
 	}
 
 	if(!strcmp ("urso", nome)){
 		a = random_number (8,10);
 		d = random_number (10,12);
+		loot[0] = new_object ("faca", lin, col);
+		loot[1] = new_object ("moeda", lin, col);
 
 		return (monstro_t){
 			*nome, .atac=a, .def=d,.hp=10,.agress=0,.estado=1,
-			.lin=lin, .col=col
+			.loot=*loot, .lin=lin, .col=col
 		};
 	}
 
 	if(!strcmp ("boss", nome)){
 		a = random_number (10,12);
+		loot[0] = new_object ("moeda", lin, col);
+		loot[1] = new_object ("moeda", lin, col);
+		loot[2] = new_object ("moeda", lin, col);
+		loot[3] = new_object ("moeda", lin, col);
+		loot[4] = new_object ("moeda", lin, col);
 
 		return (monstro_t){
 			*nome, .atac=a, .def=15,.hp=15,.agress=0,.estado=1,
-			.lin=lin, .col=col
+			.loot=*loot, .lin=lin, .col=col
 		};
 	}
 }
@@ -207,7 +239,8 @@ void random_start (void)
 				else labirinto[lin][col].portas[p] = random_number(0, 1);
 			}
 			// descricao aleatoria
-			s = random_number (0, 24);
+			// (TODO): trocar 13 para o numero de descricoes
+			s = random_number (0, 13);
 			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
 		}
 	}
@@ -367,7 +400,11 @@ int main (int argc, char *argv[])
 	self_fifo = open(SERVER_FIFO, O_WRONLY);
 
 	printf ("SERVER STARTED\n");
-	while (1) {
+	while (1) {	
+		// (TODO): remover
+		printf ("\n");
+		show_user_list ();
+
 		// clear buffers
 		memset (&req.command[0], 0, sizeof (req.command));
 		for (i = 0; i < 3; i++)
@@ -386,9 +423,9 @@ int main (int argc, char *argv[])
 
 
 		// HANDLE REQUEST
-		// Hello usado para testar comunicao client-server-client
+
 		if (!strcmp (req.command, "logout")) {
-			strcpy (rep.buffer, "Goodbye!!");
+			strcpy (rep.buffer, "LOGOUT");
 			remove_user (req.client_pid);
 
 		} else if (!strcmp (req.command, "AUTHENTICATE")) {
@@ -406,6 +443,8 @@ int main (int argc, char *argv[])
 				printf ("[SERVIDOR] - Novo jogador [%s] conhecido por"
 						" [jogador %d]\n", req.argument[0], n_user);
 				n_user++;
+
+
 
 
 			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
@@ -431,11 +470,14 @@ int main (int argc, char *argv[])
 
 				// AVISAR TODOS OS UTILIZADORES
 			}
+			strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
 
-		} else if (!strcmp (req.command, "jogar") {
+		} else if (!strcmp (req.command, "jogar")) {
 			users_playing[n_us_play] = find_user (req.client_pid);
 			n_us_play++;
-			// (TODO): acabar comando
+
+			sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
+				       	&labirinto[s_inic_lin][s_inic_col].descricao);
 
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
