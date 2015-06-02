@@ -70,7 +70,11 @@ object_t new_object (char *name, int lin, int col)
 	nome[9] = 0;
 
 	if (!strcmp ("sandes", name))
-		return (object_t) { *nome, 0.5, 10, 0, 0, 1, 3, 0, lin, col };
+		return (object_t) {
+			*nome, .peso=0.5, .raridade=10,
+			.f_ataque=0, .f_defesa=0, .max_uso=1,
+			.hp_diff=3, .def_diff=0, .lin=lin, .col=col
+		};
 
 	if (!strcmp ("aspirina", name))
 		return (object_t) {
@@ -122,57 +126,64 @@ object_t new_object (char *name, int lin, int col)
 		};
 }
 
-monstro_t new_monster(char *nome, int lin, int col){
+monstro_t new_monster(char *nome, int lin, int col)
+{
 	int a,d,s;
+
 	if(!strcmp ("morcego", nome)){
-		a = random_number(1,4);
-		d = random_number(3,4);
-		s = random_numer(4,5);
+		a = random_number (1,4);
+		d = random_number (3,4);
+		s = random_number (4,5);
 		return (monstro_t){
-			*nome, .ataque=a, .defesa=d,.hp=s,.agress=1,.estado=0;
+			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
+			.lin=lin, .col=col
 		};
 	}
 
 	if(!strcmp ("escorpiao", nome)){
 		a = random_number(1,7);
 		d = random_number(5,7);
-		s = random_numer(7,9);
+		s = random_number (7,9);
 		return (monstro_t){
-			*nome, .ataque=a, .defesa=d,.hp=s,.agress=1,.estado=1;
+			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=1,
+			.lin=lin, .col=col
 		};
 	}
 
 	if(!strcmp ("lobisomem", nome)){
-		a = random_number(5,7);
-		d = random_number(5,7);
-		s = random_numer(7,9);
+		a = random_number  (5,7);
+		d = random_number (5,7);
+		s = random_number (7,9);
 
 		return (monstro_t){
-			*nome, .ataque=a, .defesa=d,.hp=s,.agress=1,.estado=0;
+			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
+			.lin=lin, .col=col
 		};
 	}
 
 	if(!strcmp ("urso", nome)){
-		a = random_number(8,10);
-		d = random_number(10,12);
+		a = random_number (8,10);
+		d = random_number (10,12);
 
 		return (monstro_t){
-			*nome, .ataque=a, .defesa=d,.hp=10,.agress=0,.estado=1;
+			*nome, .atac=a, .def=d,.hp=10,.agress=0,.estado=1,
+			.lin=lin, .col=col
 		};
 	}
 
 	if(!strcmp ("boss", nome)){
-		a = random_number(10,12);
+		a = random_number (10,12);
 
 		return (monstro_t){
-			*nome, .ataque=a, .defesa=15,.hp=15,.agress=0,.estado=1;
+			*nome, .atac=a, .def=15,.hp=15,.agress=0,.estado=1,
+			.lin=lin, .col=col
 		};
 	}
 }
 
 void random_start (void)
 {
-	int lin, col, p, i;
+	int lin, col, p, i, s;
 	char obj_name[10];
 
 	init_random_generator ();
@@ -195,6 +206,9 @@ void random_start (void)
 
 				else labirinto[lin][col].portas[p] = random_number(0, 1);
 			}
+			// descricao aleatoria
+			s = random_number (0, 24);
+			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
 		}
 	}
 
@@ -212,6 +226,31 @@ void random_start (void)
 		strcpy (obj_name, obj_names[p]);
 
 		lab_object_list[i] = new_object (obj_name, lin, col);
+	}
+
+	for(i = 0; i < MAX_N_MONTROS; i++){
+		lin = random_number (0, 9);
+		col = random_number (0, 9);
+
+		// 10 morcegos
+		if(i < 10)
+			monster_list[i] = new_monster ("morcego", lin, col);
+
+		// 10 escorpioes
+		else if(9 < i && i < 20)
+			monster_list[i] = new_monster ("escorpiao", lin, col);
+
+		// 5 lobisomens
+		else if(19 < i && i < 24)
+			monster_list[i] = new_monster ("lobisomem", lin, col);
+
+		// 3 ursos
+		else if(i < 23 && i < 25)
+			monster_list[i] = new_monster ("urso", lin, col);
+
+		// 1 boss
+		else if(i == 25)
+			monster_list[i] = new_monster ("boss", lin, col);
 	}
 }
 
@@ -255,6 +294,8 @@ void read_start_file (char *filename)
 	// ao sair do loop dever se encontrar na 10 linha do ficheiro
 	if (f_lin != 10) f_lin++;
 
+	// (TODO) Corrigir fscanfs;2
+
 	while (fscanf (start_fp, "%s %d %d", m_name, &m_lin, &m_col) == 3) {
 		if (f_lin == 20)
 			break;
@@ -279,10 +320,12 @@ void read_start_file (char *filename)
 
 int main (int argc, char *argv[])
 {
-	int n, i, n_user=0;
-	char response[REP_BUFF_SIZE];
+	int n, i;
+	char response[REP_BUFF_SIZE], aviso_end[BUFF_SIZE];
 	char username[10], password[10];
 	char line[20];
+
+	int n_user=0, n_us_play=0, game_started=0;
 
 	FILE *user_fp;
 
@@ -369,20 +412,33 @@ int main (int argc, char *argv[])
 
 		} else if (!strcmp (req.command, "novo")) {
 			if (user_list[0].client_pid != req.client_pid)
-				strcpy (rep.buffer, "Nao e o Utilizador 1, logo nao pode iniciar ");
+				strcpy (rep.buffer, "Nao e o utilizador 1, logo nao pode iniciar ");
+
+			else if (game_started)
+				strcpy (rep.buffer,
+					"Ja existe um jogo a decorrer!\n"
+					"Utilize o comando [jogar] para entrar");
 
 			else {
 				// (TODO): start timeout
 				i = atoi (req.argument[1]); // esta a converter bem
-				if (i < 10)
+				if (i < 10){
 					random_start ();
-
+					game_started = 1;
+				}
 				else
 					read_start_file (req.argument[1]);
+
+				// AVISAR TODOS OS UTILIZADORES
 			}
 
+		} else if (!strcmp (req.command, "jogar") {
+			users_playing[n_us_play] = find_user (req.client_pid);
+			n_us_play++;
+			// (TODO): acabar comando
+
 		} else {
-			strcpy (rep.buffer, "Not a valid command");
+			strcpy (rep.buffer, "Commando Invalido!!!");
 		}
 
 		// SEND RESPONSE

@@ -77,8 +77,8 @@ int main (void)
 			if (!strcmp (word[0], "logout"))
 				strcpy (req.command, "logout");
 
-			if (!strcmp (word[0], "hello"))
-				strcpy (req.command, "hello");
+			if (!strcmp (word[0], "jogar"))
+				strcpy (req.command, "jogar");
 
 			if (!strcmp (word[0], "novo")) {
 				strcpy (req.command, "novo");
