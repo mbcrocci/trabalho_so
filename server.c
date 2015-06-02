@@ -479,6 +479,14 @@ int main (int argc, char *argv[])
 			sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
 				       	&labirinto[s_inic_lin][s_inic_col].descricao);
 
+
+
+		} else if (!strcmp (req.command, "info")) {
+			sprintf ("HP: %d\n", curr_user.hp);
+			// (TODO): acabar comando
+
+
+			
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
 		}
