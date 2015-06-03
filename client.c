@@ -88,6 +88,9 @@ int main (void)
 			if (!strcmp (word[0], "desistir"))
 				strcpy (req.command, "desistir");
 
+			if (!strcmp (word[0], "terminar"))
+				strcpy (req.command, "terminar");
+
 			if (!strcmp (word[0], "novo")) {
 				strcpy (req.command, "novo");
 				strcpy (req.argument[0], word[1]); // timeout

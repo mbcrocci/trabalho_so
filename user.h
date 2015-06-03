@@ -30,7 +30,7 @@ int user_is_first (pid_t client_pid);
 user_t find_user (pid_t client_pid);
 void remove_user (pid_t client_pid);
 void remove_user_playing (pid_t client_pid);
-
+void update_position (pid_t client_pid, int lin, int col);
 void show_saco (user_t curr_user);
 
 #endif

@@ -33,8 +33,6 @@ user_t new_user (pid_t client_pid)
 
     peso = saco[0].peso + saco[1].peso;
 
-    //(TODO): resolver WARNING -> saco
-
     return (user_t) {.client_pid=client_pid, .hp=20, .hp_max=30,
                      .saco={*saco}, .peso_saco=peso,
                      .lin=s_inic_lin, .col=s_inic_col };
@@ -98,6 +96,17 @@ void remove_user_playing (pid_t client_pid)
 
     // asegurar que o ultimo ultilzador nao repete ao final do vector
     memset (&user_list[MAX_USERS-1], 0, sizeof (user_t));
+}
+
+void update_position (pid_t client_pid, int lin, int col)
+{
+	int i;
+	for (i = 0; i < MAX_USERS; i++)
+		if (user_list[i].client_pid == client_pid)
+			break;
+
+	user_list[i].lin = lin;
+	user_list[i].col = col;
 }
 
 void show_saco (user_t curr_user)
