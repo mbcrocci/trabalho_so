@@ -20,16 +20,17 @@ int random_number (int min, int max)
 void show_user_list (void)
 {
 	int i;
-	printf ("\n[USER LIST]");
-	for (i = 0; i < MAX_USERS; i++)
+	printf ("\n[USER LIST]\t[USERS PLAYING]\n");
+	for (i = 0; i < MAX_USERS; i++) {
 		if (user_list[i].client_pid != 0)
-			printf (" %d", user_list[i].client_pid);
+			printf ("%d", user_list[i].client_pid);
 
-	printf ("\n[USERS PLAYING] ");
-	for (i = 0; i < MAX_USERS; i++)
 		if (users_playing[i].client_pid != 0)
-			printf (" %d", users_playing[i].client_pid);
+			printf (" \t\t%d", users_playing[i].client_pid);
 
+		if (user_list[i].client_pid != 0 || users_playing[i].client_pid != 0)
+			printf ("\n");
+	}
 	printf ("\n");
 }
 
@@ -68,6 +69,7 @@ user_t find_user (pid_t client_pid)
 			return user_list[i];
 }
 
+// remover utilizador da lista de jogadores ligados ao servidor
 void remove_user (pid_t client_pid)
 {
 	int i, j;
@@ -78,6 +80,22 @@ void remove_user (pid_t client_pid)
 
 	for (j = i; j < MAX_USERS-1; j++)
 		user_list[j] = user_list[j+1];
+
+	// asegurar que o ultimo ultilzador nao repete ao final do vector
+	memset (&user_list[MAX_USERS-1], 0, sizeof (user_t));
+}
+
+// remover utilizador da lista de jogadores que estao a jogar
+void remove_user_playing (pid_t client_pid)
+{	
+	int i, j;
+	// encontrar o utilizador a remover
+	for (i = 0; i < MAX_USERS; i++)
+		if (client_pid == users_playing[i].client_pid)
+			break;
+
+	for (j = i; j < MAX_USERS-1; j++)
+		users_playing[j] = users_playing[j+1];
 
 	// asegurar que o ultimo ultilzador nao repete ao final do vector
 	memset (&user_list[MAX_USERS-1], 0, sizeof (user_t));
@@ -427,6 +445,7 @@ int main (int argc, char *argv[])
 		if (!strcmp (req.command, "logout")) {
 			strcpy (rep.buffer, "LOGOUT");
 			remove_user (req.client_pid);
+			remove_user_playing (req.client_pid);
 
 		} else if (!strcmp (req.command, "AUTHENTICATE")) {
 			// (TODO): Ver se ja passou o timeout
@@ -469,20 +488,21 @@ int main (int argc, char *argv[])
 					read_start_file (req.argument[1]);
 
 				// AVISAR TODOS OS UTILIZADORES
+				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
 			}
-			strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
-
 		} else if (!strcmp (req.command, "jogar")) {
-			users_playing[n_us_play] = find_user (req.client_pid);
-			n_us_play++;
+			if (!game_started)
+				strcpy (rep.buffer, "O Jogo ainda nao comecou, utilize o comando \"novo\" para comecar");
 
-			sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
-				       	&labirinto[s_inic_lin][s_inic_col].descricao);
+			else {
+				users_playing[n_us_play] = find_user (req.client_pid);
+				n_us_play++;
 
-
-
+				sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
+						&labirinto[s_inic_lin][s_inic_col].descricao);
+			}
 		} else if (!strcmp (req.command, "info")) {
-			sprintf ("HP: %d\n", curr_user.hp);
+			sprintf (rep.buffer, "HP: %d\n", curr_user.hp);
 			// (TODO): acabar comando
 
 
