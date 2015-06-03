@@ -34,6 +34,13 @@ void show_user_list (void)
 	printf ("\n");
 }
 
+void show_saco (user_t curr_user)
+{
+	int i;
+	for (i = 0; i < 10; i++)
+		printf("%s\n", curr_user.saco[i].nome);
+}
+
 void trata_sig (int i)
 {
 	fprintf (stderr, "\nSERVER TERMINATING\n");
@@ -58,7 +65,7 @@ user_t new_user (pid_t client_pid)
 	//(TODO): resolver WARNING -> saco
 
 	return (user_t) {.client_pid=client_pid, .hp=20, .hp_max=30,
-					 .saco=*saco, .peso_saco=peso,
+					 .saco={*saco}, .peso_saco=peso,
 					 .lin=s_inic_lin, .col=s_inic_col };
 }
 user_t find_user (pid_t client_pid)
@@ -102,65 +109,60 @@ void remove_user_playing (pid_t client_pid)
 }
 
 
-object_t new_object (char *name, int lin, int col)
+object_t new_object (char name[10], int lin, int col)
 {
-	char nome[10];
-
-	memcpy (nome, name, 10);
-	nome[9] = 0;
-
 	if (!strcmp ("sandes", name))
 		return (object_t) {
-			*nome, .peso=0.5, .raridade=10,
+			"sandes", .peso=0.5, .raridade=10,
 			.f_ataque=0, .f_defesa=0, .max_uso=1,
 			.hp_diff=3, .def_diff=0, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("aspirina", name))
 		return (object_t) {
-			*nome, .peso=0.1, .raridade=20,
+			"aspirina", .peso=0.1, .raridade=20,
 			.f_ataque=0, .f_defesa=0, .max_uso=1,
 			.hp_diff=1, .def_diff=0, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("xarope", name))
 		return (object_t) {
-			*nome, .peso=1, .raridade=4,
+			"xarope", .peso=1, .raridade=4,
 			.f_ataque=0, .f_defesa=0, .max_uso=1,
 			.hp_diff=4, .def_diff=0, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("faca", name))
 		return (object_t) {
-			*nome, .peso=2, .raridade=5,
+			"faca", .peso=2, .raridade=5,
 			.f_ataque=5, .f_defesa=0, .max_uso=0,
 			.hp_diff=0, .def_diff=0, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("espada", name))
 		return (object_t) {
-			*nome, .peso=8, .raridade=3,
+			"espada", .peso=8, .raridade=3,
 			.f_ataque=8, .f_defesa=2, .max_uso=0,
 			.hp_diff=0, .def_diff=2, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("granada", name))
 		return (object_t) {
-			*nome, .peso=1, .raridade=2,
+			"granada", .peso=1, .raridade=2,
 			.f_ataque=30, .f_defesa=0, .max_uso=1,
 			.hp_diff=-5, .def_diff=0, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("escudo", name))
 		return (object_t) {
-			*nome, .peso=4, .raridade=4,
+			"escudo", .peso=4, .raridade=4,
 			.f_ataque=5, .f_defesa=0, .max_uso=0,
 			.hp_diff=0, .def_diff=5, .lin=lin, .col=col
 		};
 
 	if (!strcmp ("moeda", name))
 		return (object_t) {
-			*nome, .peso=0.1, .raridade=5,
+			"moeda", .peso=0.1, .raridade=5,
 			.f_ataque=0, .f_defesa=0, .max_uso=0,
 			.hp_diff=0, .def_diff=0, .lin=lin, .col=col
 		};
@@ -439,6 +441,7 @@ int main (int argc, char *argv[])
 		printf ("[READ] Request from %d ... (%d bytes)\n",
 			req.client_pid, n);
 
+		curr_user = find_user (req.client_pid);
 
 		// HANDLE REQUEST
 
@@ -502,11 +505,12 @@ int main (int argc, char *argv[])
 						&labirinto[s_inic_lin][s_inic_col].descricao);
 			}
 		} else if (!strcmp (req.command, "info")) {
-			sprintf (rep.buffer, "HP: %d\n", curr_user.hp);
-			// (TODO): acabar comando
+			// (TODO): FIX BUG
+			sprintf (rep.buffer, "HP: %d\nSaco: %s, %s", curr_user.hp,
+					curr_user.saco[0].nome, curr_user.saco[1].nome);
 
+			show_saco (curr_user);
 
-			
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
 		}

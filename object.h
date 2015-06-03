@@ -5,7 +5,7 @@ typedef struct {
 	char nome[OBJECT_NAME_SIZE];
 	float peso;
 	int raridade, f_ataque, f_defesa, max_uso;
-	int hp_diff, def_diff; // "Quando usado" e "Quando Equipado" respct.
+	int hp_diff, def_diff; // "Quando usado" e "Quando Equipado" respctivamente
 	int lin, col;
 } object_t;
 

@@ -88,6 +88,9 @@ int main (void)
 				strcpy (req.argument[1], word[2]); // dificuldade ou ficheiro
 			}
 
+			if (!strcmp (word[0], "info"))
+				strcpy (req.command, "info");
+
 			// send request
 			n = write (server_fd, &req, sizeof (req));
 
