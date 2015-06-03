@@ -94,7 +94,7 @@ void remove_user (pid_t client_pid)
 
 // remover utilizador da lista de jogadores que estao a jogar
 void remove_user_playing (pid_t client_pid)
-{	
+{
 	int i, j;
 	// encontrar o utilizador a remover
 	for (i = 0; i < MAX_USERS; i++)
@@ -178,7 +178,7 @@ monstro_t new_monster(char *nome, int lin, int col)
 		d = random_number (3,4);
 		s = random_number (4,5);
 		return (monstro_t){
-			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
+			"morcego", .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
 			.lin=lin, .col=col
 		};
 	}
@@ -189,7 +189,7 @@ monstro_t new_monster(char *nome, int lin, int col)
 		s = random_number (7,9);
 		loot[0] = new_object ("moeda", lin, col);
 		return (monstro_t){
-			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=1,
+			"escorpiao", .atac=a, .def=d,.hp=s,.agress=1,.estado=1,
 			.loot=*loot, .lin=lin, .col=col
 		};
 	}
@@ -201,7 +201,7 @@ monstro_t new_monster(char *nome, int lin, int col)
 		loot[0] = new_object ("faca", lin, col);
 
 		return (monstro_t){
-			*nome, .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
+			"lobisomem", .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
 			.loot=*loot, .lin=lin, .col=col
 		};
 	}
@@ -213,7 +213,7 @@ monstro_t new_monster(char *nome, int lin, int col)
 		loot[1] = new_object ("moeda", lin, col);
 
 		return (monstro_t){
-			*nome, .atac=a, .def=d,.hp=10,.agress=0,.estado=1,
+			"urso", .atac=a, .def=d,.hp=10,.agress=0,.estado=1,
 			.loot=*loot, .lin=lin, .col=col
 		};
 	}
@@ -227,7 +227,7 @@ monstro_t new_monster(char *nome, int lin, int col)
 		loot[4] = new_object ("moeda", lin, col);
 
 		return (monstro_t){
-			*nome, .atac=a, .def=15,.hp=15,.agress=0,.estado=1,
+			"boss", .atac=a, .def=15,.hp=15,.agress=0,.estado=1,
 			.loot=*loot, .lin=lin, .col=col
 		};
 	}
@@ -420,7 +420,7 @@ int main (int argc, char *argv[])
 	self_fifo = open(SERVER_FIFO, O_WRONLY);
 
 	printf ("SERVER STARTED\n");
-	while (1) {	
+	while (1) {
 		// (TODO): remover
 		printf ("\n");
 		show_user_list ();
@@ -435,7 +435,7 @@ int main (int argc, char *argv[])
 		// READ REQUEST
 		n = read (server_fd, &req, sizeof (req));
 		if (n < sizeof(req)) {
-			fprintf(stderr, "\nRequest imcompleto");
+			fprintf (stderr, "\nRequest imcompleto");
 			continue;
 		}
 		printf ("[READ] Request from %d ... (%d bytes)\n",
@@ -457,22 +457,19 @@ int main (int argc, char *argv[])
 			//if (!strcmp (username, req.argument[0]) &&
 			//	!strcmp (password, req.argument[1])) {
 
-				strcpy(rep.buffer, "AUTHENTICATED");
+			strcpy(rep.buffer, "AUTHENTICATED");
 
-				// adicionar utilizador a lista
-				user_list[n_user] = new_user (req.client_pid);
+			// adicionar utilizador a lista
+			user_list[n_user] = new_user (req.client_pid);
 
-				printf ("[SERVIDOR] - Novo jogador [%s] conhecido por"
-						" [jogador %d]\n", req.argument[0], n_user);
-				n_user++;
-
-
-
+			printf ("[SERVIDOR] - Novo jogador [%s] conhecido por"
+					" [jogador %d]\n", req.argument[0], n_user);
+			n_user++;
 
 			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
 
 		} else if (!strcmp (req.command, "novo")) {
-			if (user_list[0].client_pid != req.client_pid)
+			if (user_list[0].client_pid != curr_user.client_pid)
 				strcpy (rep.buffer, "Nao e o utilizador 1, logo nao pode iniciar ");
 
 			else if (game_started)
@@ -490,7 +487,7 @@ int main (int argc, char *argv[])
 				else
 					read_start_file (req.argument[1]);
 
-				// AVISAR TODOS OS UTILIZADORES
+				// (TODO): AVISAR TODOS OS UTILIZADORES
 				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
 			}
 		} else if (!strcmp (req.command, "jogar")) {
@@ -498,11 +495,56 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "O Jogo ainda nao comecou, utilize o comando \"novo\" para comecar");
 
 			else {
-				users_playing[n_us_play] = find_user (req.client_pid);
+				users_playing[n_us_play] = find_user (curr_user.client_pid);
 				n_us_play++;
 
+				curr_user.lin = s_inic_lin;
+				curr_user.col = s_inic_col;
+
 				sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
-						&labirinto[s_inic_lin][s_inic_col].descricao);
+						labirinto[s_inic_lin][s_inic_col].descricao);
+			}
+		} else if (!strcmp (req.command, "sair")) {
+			if (curr_user.lin != s_inic_lin || curr_user.col != s_inic_col)
+				strcpy (rep.buffer, "Nao esta na sala de inicio");
+
+			else {
+				strcpy (rep.buffer, "Saiu do jogo");
+				// (TODO): Avisar todos os jogadores
+				// 		  e dizer quem saiu e quantas moeads tinha
+
+				for (i = 0; i < n_us_play; i++)
+					remove_user_playing (users_playing[i].client_pid);
+
+				n_us_play = 0;
+				game_started = 0;
+			}
+		} else if (!strcmp (req.command, "terminar")) {
+			// Nao e o primeiro jogador
+			if (curr_user.client_pid != user_list[0].client_pid)
+				strcpy (rep.buffer, "Nao e o primeiro jogador, "
+				        "nao pode terminar o jogo");
+			else {
+				strcpy (rep.buffer, "Terminou o jogo");
+				// (TODO): Avisar todos os jogadores
+				// 		   e dizer quem tem mais moedas
+
+				for (i = 0; i < n_us_play; i++)
+					remove_user_playing (users_playing[i].client_pid);
+
+				n_us_play = 0;
+				game_started = 0;
+			}
+		} else if (!strcmp (req.command, "desistir")){
+			// ver se esta a jogar
+			for (i = 0; i < n_us_play; i++) {
+				if (users_playing[i].client_pid == curr_user.client_pid) {
+					strcpy (rep.buffer, "Desistiu");
+					remove_user_playing (curr_user.client_pid);
+					break;
+				}
+				else
+					strcpy (rep.buffer, "Nao esta a jogar, nao pode desistir");
 			}
 		} else if (!strcmp (req.command, "info")) {
 			// (TODO): FIX BUG

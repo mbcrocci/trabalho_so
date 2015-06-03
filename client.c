@@ -82,6 +82,12 @@ int main (void)
 			if (!strcmp (word[0], "jogar"))
 				strcpy (req.command, "jogar");
 
+			if (!strcmp (word[0], "sair"))
+				strcpy (req.command, "sair");
+
+			if (!strcmp (word[0], "desistir"))
+				strcpy (req.command, "desistir");
+
 			if (!strcmp (word[0], "novo")) {
 				strcpy (req.command, "novo");
 				strcpy (req.argument[0], word[1]); // timeout
