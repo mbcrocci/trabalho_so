@@ -1,45 +1,9 @@
 #include <signal.h>
-#include <time.h>
 
 #include "util.h"
-
-int server_fd, client_fd;
-int s_inic_lin, s_inic_col;
-
-void init_random_generator (void)
-{
-	srand ((unsigned) time (NULL));
-}
-
-int random_number (int min, int max)
-{
-	return min + rand () % (max-min+1);
-}
-
-// (TODO): APAGAR DEPOIS
-void show_user_list (void)
-{
-	int i;
-	printf ("\n[USER LIST]\t[USERS PLAYING]\n");
-	for (i = 0; i < MAX_USERS; i++) {
-		if (user_list[i].client_pid != 0)
-			printf ("%d", user_list[i].client_pid);
-
-		if (users_playing[i].client_pid != 0)
-			printf (" \t\t%d", users_playing[i].client_pid);
-
-		if (user_list[i].client_pid != 0 || users_playing[i].client_pid != 0)
-			printf ("\n");
-	}
-	printf ("\n");
-}
-
-void show_saco (user_t curr_user)
-{
-	int i;
-	for (i = 0; i < 10; i++)
-		printf("%s\n", curr_user.saco[i].nome);
-}
+#include "object.h"
+#include "user.h"
+#include "monster.h"
 
 void trata_sig (int i)
 {
@@ -50,193 +14,22 @@ void trata_sig (int i)
 	exit (EXIT_SUCCESS);
 }
 
-user_t new_user (pid_t client_pid)
-{
-	float peso;
-	object_t saco[10];
-	memset (&saco[0], 0, sizeof (object_t) *10); // esvaziar o saco de lixo
-
-	// (TODO): o object tem a mesma lin, col que user
-	saco[0] = new_object ("aspirina", 0, 0);
-	saco[1] = new_object ("faca", 0, 0);
-
-	peso = saco[0].peso + saco[1].peso;
-
-	//(TODO): resolver WARNING -> saco
-
-	return (user_t) {.client_pid=client_pid, .hp=20, .hp_max=30,
-					 .saco={*saco}, .peso_saco=peso,
-					 .lin=s_inic_lin, .col=s_inic_col };
-}
-user_t find_user (pid_t client_pid)
-{
-	int i;
-	for (i = 0; i < MAX_USERS; i++)
-		if (user_list[i].client_pid == client_pid)
-			return user_list[i];
-}
-
-// remover utilizador da lista de jogadores ligados ao servidor
-void remove_user (pid_t client_pid)
-{
-	int i, j;
-	// encontrar o utilizador a remover
-	for (i = 0; i < MAX_USERS; i++)
-		if (client_pid == user_list[i].client_pid)
-			break;
-
-	for (j = i; j < MAX_USERS-1; j++)
-		user_list[j] = user_list[j+1];
-
-	// asegurar que o ultimo ultilzador nao repete ao final do vector
-	memset (&user_list[MAX_USERS-1], 0, sizeof (user_t));
-}
-
-// remover utilizador da lista de jogadores que estao a jogar
-void remove_user_playing (pid_t client_pid)
-{
-	int i, j;
-	// encontrar o utilizador a remover
-	for (i = 0; i < MAX_USERS; i++)
-		if (client_pid == users_playing[i].client_pid)
-			break;
-
-	for (j = i; j < MAX_USERS-1; j++)
-		users_playing[j] = users_playing[j+1];
-
-	// asegurar que o ultimo ultilzador nao repete ao final do vector
-	memset (&user_list[MAX_USERS-1], 0, sizeof (user_t));
-}
-
-
-object_t new_object (char name[10], int lin, int col)
-{
-	if (!strcmp ("sandes", name))
-		return (object_t) {
-			"sandes", .peso=0.5, .raridade=10,
-			.f_ataque=0, .f_defesa=0, .max_uso=1,
-			.hp_diff=3, .def_diff=0, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("aspirina", name))
-		return (object_t) {
-			"aspirina", .peso=0.1, .raridade=20,
-			.f_ataque=0, .f_defesa=0, .max_uso=1,
-			.hp_diff=1, .def_diff=0, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("xarope", name))
-		return (object_t) {
-			"xarope", .peso=1, .raridade=4,
-			.f_ataque=0, .f_defesa=0, .max_uso=1,
-			.hp_diff=4, .def_diff=0, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("faca", name))
-		return (object_t) {
-			"faca", .peso=2, .raridade=5,
-			.f_ataque=5, .f_defesa=0, .max_uso=0,
-			.hp_diff=0, .def_diff=0, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("espada", name))
-		return (object_t) {
-			"espada", .peso=8, .raridade=3,
-			.f_ataque=8, .f_defesa=2, .max_uso=0,
-			.hp_diff=0, .def_diff=2, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("granada", name))
-		return (object_t) {
-			"granada", .peso=1, .raridade=2,
-			.f_ataque=30, .f_defesa=0, .max_uso=1,
-			.hp_diff=-5, .def_diff=0, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("escudo", name))
-		return (object_t) {
-			"escudo", .peso=4, .raridade=4,
-			.f_ataque=5, .f_defesa=0, .max_uso=0,
-			.hp_diff=0, .def_diff=5, .lin=lin, .col=col
-		};
-
-	if (!strcmp ("moeda", name))
-		return (object_t) {
-			"moeda", .peso=0.1, .raridade=5,
-			.f_ataque=0, .f_defesa=0, .max_uso=0,
-			.hp_diff=0, .def_diff=0, .lin=lin, .col=col
-		};
-}
-
-monstro_t new_monster(char *nome, int lin, int col)
-{
-	int a,d,s;
-	object_t loot[5];
-
-	if(!strcmp ("morcego", nome)){
-		a = random_number (1,4);
-		d = random_number (3,4);
-		s = random_number (4,5);
-		return (monstro_t){
-			"morcego", .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
-			.lin=lin, .col=col
-		};
-	}
-
-	if(!strcmp ("escorpiao", nome)){
-		a = random_number(1,7);
-		d = random_number(5,7);
-		s = random_number (7,9);
-		loot[0] = new_object ("moeda", lin, col);
-		return (monstro_t){
-			"escorpiao", .atac=a, .def=d,.hp=s,.agress=1,.estado=1,
-			.loot=*loot, .lin=lin, .col=col
-		};
-	}
-
-	if(!strcmp ("lobisomem", nome)){
-		a = random_number  (5,7);
-		d = random_number (5,7);
-		s = random_number (7,9);
-		loot[0] = new_object ("faca", lin, col);
-
-		return (monstro_t){
-			"lobisomem", .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
-			.loot=*loot, .lin=lin, .col=col
-		};
-	}
-
-	if(!strcmp ("urso", nome)){
-		a = random_number (8,10);
-		d = random_number (10,12);
-		loot[0] = new_object ("faca", lin, col);
-		loot[1] = new_object ("moeda", lin, col);
-
-		return (monstro_t){
-			"urso", .atac=a, .def=d,.hp=10,.agress=0,.estado=1,
-			.loot=*loot, .lin=lin, .col=col
-		};
-	}
-
-	if(!strcmp ("boss", nome)){
-		a = random_number (10,12);
-		loot[0] = new_object ("moeda", lin, col);
-		loot[1] = new_object ("moeda", lin, col);
-		loot[2] = new_object ("moeda", lin, col);
-		loot[3] = new_object ("moeda", lin, col);
-		loot[4] = new_object ("moeda", lin, col);
-
-		return (monstro_t){
-			"boss", .atac=a, .def=15,.hp=15,.agress=0,.estado=1,
-			.loot=*loot, .lin=lin, .col=col
-		};
-	}
-}
-
 void random_start (void)
 {
 	int lin, col, p, i, s;
 	char obj_name[10];
+
+	// possiveis descricoes para a sala
+	char sala_desc[25][30] = {
+	"baixa","com corredor baixo", "com corredor apertado", "fria",
+	"alta", "com corredor ventoso" , "escura",
+	"com corredor escorregadio", "humida", "com corredor molhado",
+	"estreita", "com corredor lamacento", "quente"
+	};
+	// possiveis nomes para o object
+	char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE] = {
+	"sandes", "aspirina", "xarope", "faca",
+	"espada", "granada", "escudo", "moeda" };
 
 	init_random_generator ();
 
