@@ -2,7 +2,7 @@
 
 void random_start (void)
 {
-	int lin, col, p, i, s;
+	int lin, col, p, i, s, n_portas;
 	char obj_name[10];
 
 	// possiveis descricoes para a sala
@@ -43,6 +43,27 @@ void random_start (void)
 			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
 		}
 	}
+
+	// garantir que existe pelo menos uma porta
+	for (lin = 0; lin < 10; lin++) {
+		for (col = 0; col < 10; col++) {
+			for (p = 0; p < 4; p++) {
+				if (labirinto[lin][col].portas[p] == 1)
+					n_portas++;
+			}
+
+			if (n_portas == 0) {
+				if (lin == 0) do { p = random_number (0, 3); } while (p == 0);
+				if (lin == 9) do { p = random_number (0, 3); } while (p == 1);
+				if (col == 0) do { p = random_number (0, 3); } while (p == 2);
+				if (col == 9) do { p = random_number (0, 3); } while (p == 3);
+
+				labirinto[lin][col].portas[p] = 1;
+			}
+			n_portas=0;
+		}
+	}
+				
 
 	// random sala inicial
 	s_inic_lin = random_number (0, 9);

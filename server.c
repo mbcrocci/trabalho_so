@@ -211,7 +211,7 @@ int main (int argc, char *argv[])
 
 				strcat (rep.buffer, "\n    Users: ");
 
-				for (i = 0; i < MAX_USERS; i++)
+				for (i = 0; i < n_us_play; i++)
 					if (users_playing[i].lin == curr_user.lin
 						&& users_playing[i].col == curr_user.col)
 						strcat (rep.buffer, users_playing[i].nome);
