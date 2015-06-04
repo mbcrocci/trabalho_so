@@ -34,5 +34,6 @@ void remove_user_playing (pid_t client_pid);
 void clear_game (void);
 void update_position (pid_t client_pid, int lin, int col);
 void show_saco (user_t curr_user);
+int mover (pid_t client_pid, int p);
 
 #endif

@@ -190,12 +190,66 @@ int main (int argc, char *argv[])
 					curr_user.saco[0].nome, curr_user.saco[1].nome);
 
 			show_saco (curr_user);
+
+
 		
-		} /*else if (!strcmp (req.command, "ver")) {
-			if (req.argument[0] == "") {
+		} else if (!strcmp (req.command, "ver")) {
+			if (!strcmp (req.argument[0], "")) {
+				strcpy (rep.buffer, "Sala:\n    Portas: ");
+				
+				for (i = 0; i < 4; i++)
+					if (labirinto[curr_user.lin][curr_user.col].portas[i] == 1) {
+						if (i == 0)
+							strcat (rep.buffer , "norte ");
+						if (i == 1)
+							strcat (rep.buffer , "sul ");
+						if (i == 2)
+							strcat (rep.buffer, "este ");
+						if (i == 3)
+							strcat (rep.buffer, "oeste ");
+				}
+
+				strcat (rep.buffer, "\n    Users: ");
+
+				for (i = 0; i < MAX_USERS; i++)
+					if (users_playing[i].lin == curr_user.lin
+						&& users_playing[i].col == curr_user.col)
+						strcat (rep.buffer, users_playing[i].nome);
+
+				// (TODO): acabar comando
+
+			}	
+
+			else {
+				//i = check_ver_arg (req.argument[0]);
 
 			}
-		}*/ else {
+
+
+		} else if (!strcmp (req.command, "mover")) {
+			if (!strcmp (req.argument[0], ""))
+				strcpy (rep.buffer, "Comando imcompleto!");
+
+			else {
+				i = 0;
+				if (!strcmp (req.argument[0], "norte"))
+					i = mover (curr_user.client_pid, 0);
+				else if (!strcmp (req.argument[0], "sul"))
+					i = mover (curr_user.client_pid, 1);
+				else if (!strcmp (req.argument[0], "este"))
+					i = mover (curr_user.client_pid, 2);
+				else if (!strcmp (req.argument[0], "oeste"))
+					i = mover (curr_user.client_pid, 3);
+
+				if (i == 0) strcpy (rep.buffer, "Nao tem essa porta");
+				else { 
+					curr_user = find_user (curr_user.client_pid);
+					sprintf (rep.buffer, 
+							"Encontra-se numa sala %s\nO que pretende fazer?", 
+							labirinto[s_inic_lin][s_inic_col].descricao);
+				}
+			}
+		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
 		}
 

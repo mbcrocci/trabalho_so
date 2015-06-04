@@ -109,6 +109,13 @@ int main (void)
 					strcpy (req.argument[0], word[1]);
 			}
 
+			if (!strcmp (word[0], "mover")) {
+				strcpy (req.command, "mover");
+
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]);
+			}
+
 			if (!strcmp (word[0], "info"))
 				strcpy (req.command, "info");
 
