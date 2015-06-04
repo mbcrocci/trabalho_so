@@ -6,11 +6,22 @@ void random_start (void)
 	char obj_name[10];
 
 	// possiveis descricoes para a sala
-	char sala_desc[25][30] = {
+	char sala_desc[53][30] = {
 	"baixa","com corredor baixo", "com corredor apertado", "fria",
-	"alta", "com corredor ventoso" , "escura",
-	"com corredor escorregadio", "humida", "com corredor molhado",
-	"estreita", "com corredor lamacento", "quente", "ventosa"
+	"alta", "com corredor ventoso" , "escura", "de honra"
+	"com corredor escorregadio", "humida", "com corredor molhado", "do ceu"
+	"estreita", "com corredor lamacento", "quente", "ventosa",
+	"dourada", "nublada", "terrorifica", "da fantasia",
+	"do medo", "da escuridao", "fantastica", "calorosa",
+	"gelada", "empinada", "inclinada", "bombastica",
+	"luxuosa", "pequena", "simples", "moderna",
+	"de trofeus", "de arte", "cheia de tecnologia", "decorada com quadros",
+	"colorida", "axadrexada","animada", "com corredor estreito",
+	"de batalha", "simples", "refinada", "antiga",
+	"de musica", "de laboratorio", "de espelhos", "com escadas",
+	"de aula", "transparente", "invisivel","sofisticada",
+	"toda decorada"
+
 	};
 	// possiveis nomes para o object
 	char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE] = {
