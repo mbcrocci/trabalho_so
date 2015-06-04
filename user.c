@@ -12,7 +12,7 @@ void show_user_list (void)
             printf ("%s", user_list[i].nome);
 
         if (users_playing[i].client_pid != 0)
-            printf (" \t\t%d", users_playing[i].client_pid);
+            printf (" \t\t%s", users_playing[i].nome);
 
         if (user_list[i].client_pid != 0 || users_playing[i].client_pid != 0)
             printf ("\n");
@@ -119,6 +119,14 @@ void update_position (pid_t client_pid, int lin, int col)
 
 	user_list[i].lin = lin;
 	user_list[i].col = col;
+	if (user_is_playing (client_pid)) {
+		for (i = 0; i < MAX_USERS; i++)
+			if (users_playing[i].client_pid == client_pid)
+				break;
+		
+		users_playing[i].lin = lin;
+		users_playing[i].col = col;
+	}
 }
 
 void show_saco (user_t curr_user)

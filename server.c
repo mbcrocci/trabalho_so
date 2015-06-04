@@ -194,7 +194,10 @@ int main (int argc, char *argv[])
 
 		
 		} else if (!strcmp (req.command, "ver")) {
-			if (!strcmp (req.argument[0], "")) {
+			if (!user_is_playing (curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta a jogar.");
+
+			else if (!strcmp (req.argument[0], "")) {
 				strcpy (rep.buffer, "Sala:\n    Portas: ");
 				
 				for (i = 0; i < 4; i++)
@@ -210,11 +213,14 @@ int main (int argc, char *argv[])
 				}
 
 				strcat (rep.buffer, "\n    Users: ");
-
-				for (i = 0; i < n_us_play; i++)
+	
+				for (i = 0; i < n_us_play; i++) {
 					if (users_playing[i].lin == curr_user.lin
-						&& users_playing[i].col == curr_user.col)
+							&& users_playing[i].col == curr_user.col) {
 						strcat (rep.buffer, users_playing[i].nome);
+						strcat (rep.buffer, " ");	
+					}
+				}
 
 				// (TODO): acabar comando
 
@@ -227,7 +233,10 @@ int main (int argc, char *argv[])
 
 
 		} else if (!strcmp (req.command, "mover")) {
-			if (!strcmp (req.argument[0], ""))
+			if (!user_is_playing (curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta a jogar");
+
+			else if (!strcmp (req.argument[0], ""))
 				strcpy (rep.buffer, "Comando imcompleto!");
 
 			else {
