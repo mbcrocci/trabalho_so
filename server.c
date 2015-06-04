@@ -98,7 +98,7 @@ int main (int argc, char *argv[])
 			strcpy(rep.buffer, "AUTHENTICATED");
 
 			// adicionar utilizador a lista
-			user_list[n_user] = new_user (req.client_pid);
+			user_list[n_user] = new_user (req.client_pid, req.argument[0]);
 
 			printf ("[SERVIDOR] - Novo jogador [%s] conhecido por"
 					" [jogador %d]\n", req.argument[0], n_user);
@@ -124,6 +124,7 @@ int main (int argc, char *argv[])
 				}
 				else
 					read_start_file (req.argument[1]);
+					game_started = 1;
 
 				// (TODO): AVISAR TODOS OS UTILIZADORES
 				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
@@ -152,9 +153,7 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Saiu do jogo");
 				// (TODO): Avisar todos os jogadores
 				// 		  e dizer quem saiu e quantas moeads tinha
-
-				for (i = 0; i < n_us_play; i++)
-					remove_user_playing (users_playing[i].client_pid);
+				clear_game ();
 
 				n_us_play = 0;
 				game_started = 0;
@@ -173,10 +172,8 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Terminou o jogo");
 				// (TODO): Avisar todos os jogadores
 				// 		   e dizer quem tem mais moedas
-
-				for (i = 0; i < n_us_play; i++)
-					remove_user_playing (users_playing[i].client_pid);
-
+				
+				clear_game ();
 				n_us_play = 0;
 				game_started = 0;
 			}
@@ -193,8 +190,12 @@ int main (int argc, char *argv[])
 					curr_user.saco[0].nome, curr_user.saco[1].nome);
 
 			show_saco (curr_user);
+		
+		} /*else if (!strcmp (req.command, "ver")) {
+			if (req.argument[0] == "") {
 
-		} else {
+			}
+		}*/ else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
 		}
 

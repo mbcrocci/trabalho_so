@@ -93,8 +93,20 @@ int main (void)
 
 			if (!strcmp (word[0], "novo")) {
 				strcpy (req.command, "novo");
-				strcpy (req.argument[0], word[1]); // timeout
-				strcpy (req.argument[1], word[2]); // dificuldade ou ficheiro
+
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]); // timeout
+
+				if (word[2] != NULL)
+					strcpy (req.argument[1], word[2]); // dificuldade ou ficheiro
+
+			}
+
+			if (!strcmp (word[0], "ver")){
+				strcpy (req.command, "ver");
+
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]);
 			}
 
 			if (!strcmp (word[0], "info"))
