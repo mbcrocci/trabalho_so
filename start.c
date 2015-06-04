@@ -10,7 +10,7 @@ void random_start (void)
 	"baixa","com corredor baixo", "com corredor apertado", "fria",
 	"alta", "com corredor ventoso" , "escura",
 	"com corredor escorregadio", "humida", "com corredor molhado",
-	"estreita", "com corredor lamacento", "quente"
+	"estreita", "com corredor lamacento", "quente", "ventosa"
 	};
 	// possiveis nomes para o object
 	char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE] = {
