@@ -140,7 +140,7 @@ int main (int argc, char *argv[])
 				update_position (curr_user.client_pid, s_inic_lin, s_inic_col);
 
 				sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
-						labirinto[s_inic_lin][s_inic_col].descricao);
+						labirinto[curr_user.lin][curr_user.col].descricao);
 			}
 		} else if (!strcmp (req.command, "sair")) {
 			if (!user_is_playing (curr_user.client_pid))
@@ -255,7 +255,7 @@ int main (int argc, char *argv[])
 					curr_user = find_user (curr_user.client_pid);
 					sprintf (rep.buffer, 
 							"Encontra-se numa sala %s\nO que pretende fazer?", 
-							labirinto[s_inic_lin][s_inic_col].descricao);
+							labirinto[curr_user.lin][curr_user.col].descricao);
 				}
 			}
 		} else {

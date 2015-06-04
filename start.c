@@ -1,14 +1,24 @@
 #include "start.h"
 
+int used_number (int s, int *array)
+{
+	int i;
+	for (i = 0; i < 53; i++)
+		if (s == array[i])
+			return 1;
+
+	return 0;
+}
+
 void random_start (void)
 {
-	int lin, col, p, i, s, n_portas;
+	int lin, col, p, i, s, n_portas, used_s[53], r;
 	char obj_name[10];
 
 	// possiveis descricoes para a sala
 	char sala_desc[53][30] = {
 	"baixa","com corredor baixo", "com corredor apertado", "fria",
-	"alta", "com corredor ventoso" , "escura", "de honra"
+	"alta", "com corredor ventoso" , "escura", "de honra",
 	"com corredor escorregadio", "humida", "com corredor molhado", "do ceu"
 	"estreita", "com corredor lamacento", "quente", "ventosa",
 	"dourada", "nublada", "terrorifica", "da fantasia",
@@ -48,10 +58,6 @@ void random_start (void)
 
 				else labirinto[lin][col].portas[p] = random_number(0, 1);
 			}
-			// descricao aleatoria
-			// (TODO): trocar 13 para o numero de descricoes
-			s = random_number (0, 13);
-			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
 		}
 	}
 
@@ -74,7 +80,15 @@ void random_start (void)
 			n_portas=0;
 		}
 	}
-				
+	// decricoes (TODO): gerar para as seguites 50 salas
+	r = 0;
+	for (lin = 0; lin < 10; lin++) {
+		for (col = 0; col < 10; col++) {
+			do { s = random_number (0, 52); } while (used_number (s, used_s));
+			used_s[r] = s;
+			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
+		}
+	}
 
 	// random sala inicial
 	s_inic_lin = random_number (0, 9);
