@@ -99,9 +99,6 @@ int main (int argc, char *argv[])
 
 			// adicionar utilizador a lista
 			user_list[n_user] = new_user (req.client_pid, req.argument[0]);
-
-			printf ("[SERVIDOR] - Novo jogador [%s] conhecido por"
-					" [jogador %d]\n", req.argument[0], n_user);
 			n_user++;
 
 			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
@@ -224,7 +221,7 @@ int main (int argc, char *argv[])
 				
 				strcat(rep.buffer, "\nMonstros: ");
 				
-				for (i = 0; i < MAX_N_MONSTROS; i++) {
+				for (i = 0; i < MAX_N_MONTROS; i++) {
 					if (monster_list[i].lin == curr_user.lin
 							&& monster_list[i].col == curr_user.col) {
 						strcat (rep.buffer, monster_list[i].nome);

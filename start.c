@@ -130,6 +130,8 @@ void random_start (void)
 		else if(i == 25)
 			monster_list[i] = new_monster ("boss", lin, col);
 	}
+
+	show_all_monsters_objects();
 }
 
 void read_start_file (char *filename)
@@ -194,4 +196,23 @@ void read_start_file (char *filename)
 	fscanf (start_fp, "%d %d", &s_inic_lin, &s_inic_col);
 
 	fclose (start_fp);
+}
+
+void show_all_monsters_objects(void)
+{
+	int i;
+	char print[1000];
+	strcat (print, "MONSTROS\n");
+	for (i = 0; i < MAX_N_MONTROS; i++) {
+		strcat (print, monster_list[i].nome);
+		strcat (print, "\n");
+	}
+
+	strcat (print, "\nOBJECTOS\n");
+	for (i = 0; i < OBJECT_NUMBER; i++) {
+		strcat (print, lab_object_list[i].nome);
+		strcat (print, "\n");
+	}
+	strcat (print, "\0");
+	fprintf (stderr, "%s\n", print);
 }
