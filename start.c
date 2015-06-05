@@ -85,6 +85,15 @@ void random_start (void)
 	for (lin = 0; lin < 10; lin++) {
 		for (col = 0; col < 10; col++) {
 			do { s = random_number (0, 52); } while (used_number (s, used_s));
+			used_s[r] = s; //r++;
+			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
+		}
+	}
+	memset (used_s, 0, sizeof(used_s));
+	r = 0;
+	for (; lin < 10; lin++) {
+		for (; col < 10; col++) {
+			do { s = random_number (0, 52); } while (used_number (s, used_s));
 			used_s[r] = s;
 			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
 		}

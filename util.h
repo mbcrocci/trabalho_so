@@ -52,5 +52,6 @@ extern char sala_desc[25][30];
 // General functions
 void init_random_generator (void);
 int random_number (int min, int max);
+void clearScreen (void);
 
 #endif

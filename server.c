@@ -88,6 +88,7 @@ int main (int argc, char *argv[])
 
 		// HANDLE REQUEST
 
+		clearScreen ();
 		if (!strcmp (req.command, "AUTHENTICATE")) {
 			// (TODO): Ver se ja passou o timeout
 			// (TODO): ler fichereiro correctamente
@@ -137,7 +138,7 @@ int main (int argc, char *argv[])
 				update_position (curr_user.client_pid, s_inic_lin, s_inic_col);
 
 				sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
-						labirinto[s_inic_lin][s_inic_col].descricao);
+						labirinto[curr_user.lin][curr_user.col].descricao);
 			}
 		} else if (!strcmp (req.command, "sair")) {
 			if (!user_is_playing (curr_user.client_pid))
@@ -219,7 +220,7 @@ int main (int argc, char *argv[])
 					}
 				}
 				
-				strcat(rep.buffer, "\nMonstros: ");
+				strcat (rep.buffer, "\nMonstros: ");
 				
 				for (i = 0; i < MAX_N_MONTROS; i++) {
 					if (monster_list[i].lin == curr_user.lin
@@ -229,7 +230,7 @@ int main (int argc, char *argv[])
 					}
 				}
 				
-				strcat(rep.buffer, "\nObjectos: ");
+				strcat (rep.buffer, "\nObjectos: ");
 				for (i = 0; i < OBJECT_NUMBER; i++) {
 					if (lab_object_list[i].lin == curr_user.lin
 							&& lab_object_list[i].col == curr_user.col) {
@@ -240,14 +241,34 @@ int main (int argc, char *argv[])
 			
 				// (TODO): acabar comando
 
-			}	
+			} else if (is_monster_name (req.argument[1])) {
+				strcpy (rep.buffer, "\nMonstros: ");
+				
+				for (i = 0; i < MAX_N_MONTROS; i++) {
+					if (monster_list[i].lin == curr_user.lin
+						&& monster_list[i].col == curr_user.col
+						&& !strcmp (req.argument[1], monster_list[i].nome)) {
 
-			else {
-				//i = check_ver_arg (req.argument[0]);
+						strcpy (rep.buffer, "Descricao: ");
+						strcat (rep.buffer, monster_list[i].nome);
+						sprintf (rep.buffer, "%s\nHP: %d\nF_Ataque: %d\nF_Defesa: %d\n",
+							   	rep.buffer, monster_list[i].hp,
+							   	monster_list[i].atac, monster_list[i].def);
+					}
+				}
 
+			} else if (is_object_name (req.argument[1])) {
+				for (i = 0; i < OBJECT_NUMBER; i++) {
+					if (lab_object_list[i].lin == curr_user.lin
+						&& lab_object_list[i].col == curr_user.col
+						&& !strcmp (req.argument[1], lab_object_list[i].nome)) {
+
+						strcpy (rep.buffer, "Descricao: ");
+						strcat (rep.buffer, lab_object_list[i].nome);
+						sprintf (rep.buffer, "%s Peso: %f", rep.buffer, lab_object_list[i].peso);
+					}
+				}
 			}
-
-
 		} else if (!strcmp (req.command, "mover")) {
 			if (!user_is_playing (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao esta a jogar");
@@ -268,10 +289,11 @@ int main (int argc, char *argv[])
 
 				if (i == 0) strcpy (rep.buffer, "Nao tem essa porta");
 				else { 
+					// update user para ter nova possicao
 					curr_user = find_user (curr_user.client_pid);
 					sprintf (rep.buffer, 
 							"Encontra-se numa sala %s\nO que pretende fazer?", 
-							labirinto[s_inic_lin][s_inic_col].descricao);
+							labirinto[curr_user.lin][curr_user.col].descricao);
 				}
 			}
 		} else {
@@ -286,7 +308,7 @@ int main (int argc, char *argv[])
 			n = write (client_fd, &rep, sizeof(rep));
  			printf ("[SERVIDOR] Enviei resposta ... (%d bytes)\n", n);
 			close (client_fd);
-		}
+		}	
 	}
 
 	fclose (user_fp);

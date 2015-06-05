@@ -20,5 +20,6 @@ monstro_t monster_list[MAX_N_MONTROS];
 
 // Functions
 monstro_t new_monster(char *nome, int lin, int col);
+int is_monster_name (char name[10]);
 
 #endif

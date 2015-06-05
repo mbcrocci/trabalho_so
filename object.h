@@ -23,5 +23,5 @@ extern char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE];
 
 // funcoes de objectos
 object_t new_object (char name[10], int lin, int col);
-
+int is_object_name (char name[10]);
 #endif

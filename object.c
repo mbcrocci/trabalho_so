@@ -58,3 +58,18 @@ object_t new_object (char name[10], int lin, int col)
             .hp_diff=0, .def_diff=0, .lin=lin, .col=col
         };
 }
+
+
+int is_object_name (char name[10])
+{
+	if (!strcmp (name, "sandes")
+		|| !strcmp (name, "aspirina")
+		|| !strcmp (name, "xarope")
+		|| !strcmp (name, "faca")
+		|| !strcmp (name, "espada")
+		|| !strcmp (name, "granada")
+		|| !strcmp (name, "escudo")
+	) return 1;
+
+	return 0;
+}
