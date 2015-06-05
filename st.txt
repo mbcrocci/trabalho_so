@@ -1,31 +1,31 @@
 .PP. .P.P .PPP ..PP .P.P ..P. .P.. ..PP .PPP ...P
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-.... .... .... .... .... .... .... .... .... ....
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-monstro 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
-objecto 0 0
+P.P.. P..P .PP. PP.P P.PP PPP. PP.. .P.P PP.P PP..
+PP.. .PP. ..PP P.P. P..P .P.P .PP. P..P PPP. .PPP
+PP.. .P.P PPP. .P.P PP.P P..P PP.P PPP. .PP. .PP.
+.PP. PP.. .P.P PPP. .P.P .PP. .P.P PPP. PP.. P..P
+.PP. PP.. PPP. P..P P.PP PP.. P..P P..P PPP. .P.P
+.PPP .PP. .PPP .PP. .P.P .PP. .P.P .P.P .P.P .PPP
+PPP. PP.P .PPP ..PP PP.P ..PP ..PP PP.. ..PP ...P
+..PP ..PP P.P. PP.P .PP. PPP. P..P .P.P .P.P .PPP
+.P.P PP.. ..PP P..P P..P .PP. .P.P .PPP PP.. PP..
+morcego 1 0
+boss 0 2
+urso 3 0
+morcego 0 4
+escorpiao 0 6
+lobisomem 7 0
+morcego 0 8
+lobisomem 9 0
+morcego 0 0
+escorpiao 0 1
+sandes 1 2
+faca 2 3
+aspirina 4 5
+sandes 6 3
+moeda 4 8
+xarope 1 9
+faca 2 6
+espada 2 7
+granada 3 6
+escudo 1 5
 0 0
