@@ -140,7 +140,7 @@ int main (int argc, char *argv[])
 				update_position (curr_user.client_pid, s_inic_lin, s_inic_col);
 
 				sprintf (rep.buffer, "Encontra-se numa sala %s\nO que pretende fazer?",
-						labirinto[curr_user.lin][curr_user.col].descricao);
+						labirinto[s_inic_lin][s_inic_col].descricao);
 			}
 		} else if (!strcmp (req.command, "sair")) {
 			if (!user_is_playing (curr_user.client_pid))
@@ -221,7 +221,26 @@ int main (int argc, char *argv[])
 						strcat (rep.buffer, " ");	
 					}
 				}
-
+				
+				strcat(rep.buffer, "\nMonstros: ");
+				
+				for (i = 0; i < MAX_N_MONSTROS; i++) {
+					if (monster_list[i].lin == curr_user.lin
+							&& monster_list[i].col == curr_user.col) {
+						strcat (rep.buffer, monster_list[i].nome);
+						strcat (rep.buffer, " ");	
+					}
+				}
+				
+				strcat(rep.buffer, "\nObjectos: ");
+				for (i = 0; i < OBJECT_NUMBER; i++) {
+					if (lab_object_list[i].lin == curr_user.lin
+							&& lab_object_list[i].col == curr_user.col) {
+						strcat (rep.buffer, lab_object_list[i].nome);
+						strcat (rep.buffer, " ");	
+					}
+				}
+			
 				// (TODO): acabar comando
 
 			}	
@@ -255,7 +274,7 @@ int main (int argc, char *argv[])
 					curr_user = find_user (curr_user.client_pid);
 					sprintf (rep.buffer, 
 							"Encontra-se numa sala %s\nO que pretende fazer?", 
-							labirinto[curr_user.lin][curr_user.col].descricao);
+							labirinto[s_inic_lin][s_inic_col].descricao);
 				}
 			}
 		} else {
