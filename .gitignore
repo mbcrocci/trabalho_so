@@ -1,4 +1,7 @@
 client
 server
 *.swp
-
+tags
+GTAGS
+GRTAGS
+GPATH
