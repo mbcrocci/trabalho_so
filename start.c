@@ -71,9 +71,10 @@ void random_start (void)
 
 			if (n_portas == 0) {
 				if (lin == 0) do { p = random_number (0, 3); } while (p == 0);
-				if (lin == 9) do { p = random_number (0, 3); } while (p == 1);
-				if (col == 0) do { p = random_number (0, 3); } while (p == 2);
-				if (col == 9) do { p = random_number (0, 3); } while (p == 3);
+				else if (lin == 9) do { p = random_number (0, 3); } while (p == 1);
+				else if (col == 0) do { p = random_number (0, 3); } while (p == 2);
+				else if (col == 9) do { p = random_number (0, 3); } while (p == 3);
+				else p = random_number (0, 3);
 
 				labirinto[lin][col].portas[p] = 1;
 			}

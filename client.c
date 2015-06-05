@@ -119,6 +119,22 @@ int main (void)
 			if (!strcmp (word[0], "info"))
 				strcpy (req.command, "info");
 
+			if (!strcmp (word[0], "diz")) {
+				strcpy (req.command, "diz");
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]);
+
+				if (word[2] != NULL)
+					strcpy (req.argument[1], word[2]);
+			}
+
+			if (!strcmp (word[0], "apanha")){
+				strcpy (req.command, "apanha");
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]);
+			}
+			
+
 			// send request
 			n = write (server_fd, &req, sizeof (req));
 

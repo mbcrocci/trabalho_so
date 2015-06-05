@@ -34,6 +34,8 @@ user_t new_user (pid_t client_pid, char nome[10])
     novo.saco[0] = new_object ("aspirina", 0, 0);
     novo.saco[1] = new_object ("faca", 0, 0);
 
+	novo.n_obj += 2;
+
 	novo.peso_saco = novo.saco[0].peso + novo.saco[1].peso;
 
     novo.client_pid=client_pid;
@@ -69,6 +71,14 @@ user_t find_user (pid_t client_pid)
     for (i = 0; i < MAX_USERS; i++)
         if (user_list[i].client_pid == client_pid)
             return user_list[i];
+}
+
+int find_user_index (pid_t client_pid)
+{
+	int i;
+	for (i = 0; i < MAX_USERS; i++)
+		if (user_list[i].client_pid == client_pid)
+			return i;
 }
 
 // remover utilizador da lista de jogadores ligados ao servidor

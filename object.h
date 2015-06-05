@@ -2,6 +2,7 @@
 #define OBJECT_H_
 
 #include <string.h>
+#include "util.h"
 
 #define OBJECT_NUMBER 8
 #define OBJECT_NAME_SIZE 10
@@ -24,4 +25,6 @@ extern char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE];
 // funcoes de objectos
 object_t new_object (char name[10], int lin, int col);
 int is_object_name (char name[10]);
+void apanha_objecto (int i, pid_t client_pid);
+
 #endif

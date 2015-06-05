@@ -296,6 +296,29 @@ int main (int argc, char *argv[])
 							labirinto[curr_user.lin][curr_user.col].descricao);
 				}
 			}
+
+		} else if (!strcmp (req.command, "apanha")) {
+			if (!strcmp (req.argument[0], ""))
+				strcpy (rep.buffer, "Comando Incompleto");
+
+			else {
+				for (i = 0; i < 10; i++)
+					if (lab_object_list[i].lin == curr_user.lin
+						&& lab_object_list[i].col == curr_user.col
+						&& !strcmp (req.argument[1], lab_object_list[i].nome))
+
+						apanha_objecto (i, curr_user.client_pid);
+				
+				strcpy (rep.buffer, "Apanhou ");
+				strcat (rep.buffer, req.argument[1]);
+			}
+		} else if(!strcmp (req.command, "diz")) {
+			if (strcmp (req.argument[1], ""))
+				strcpy (rep.buffer, "Nao disse nada");
+
+			else {
+				// (TODO): arranjar maneira de dizer a todos
+			}
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
 		}

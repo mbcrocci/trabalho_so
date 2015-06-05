@@ -10,6 +10,7 @@ typedef struct {
     pid_t client_pid; //Usado para encontrar/comparar users
 	char nome[10];
     int hp, hp_max;
+	int n_obj;
     object_t saco[10];
     float peso_saco;
 
@@ -29,6 +30,7 @@ user_t new_user (pid_t client_pid, char nome[10]);
 int user_is_playing (pid_t client_pid);
 int user_is_first (pid_t client_pid);
 user_t find_user (pid_t client_pid);
+int find_user_index (pid_t client_pid);
 void remove_user (pid_t client_pid);
 void remove_user_playing (pid_t client_pid);
 void clear_game (void);
