@@ -112,10 +112,11 @@ void random_start (void)
 
 		// random object
 		p = random_number (0, 7);
-		strcpy (obj_name, obj_names[p]);
+		//strcpy (obj_name, obj_names[p]);
 
 		labirinto[lin][col].objectos[labirinto[lin][col].n_obj] = new_object (
-				obj_name, lin, col);
+				obj_names[p], lin, col);
+		labirinto[lin][col].n_obj++;
 	}
 
 	for(i = 0; i < MAX_N_MONTROS; i++){
