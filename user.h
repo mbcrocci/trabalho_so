@@ -8,9 +8,9 @@
 
 typedef struct {
     pid_t client_pid; //Usado para encontrar/comparar users
-	char nome[10];
+    char nome[10];
     int hp, hp_max;
-	int n_obj;
+    int n_obj;
     object_t saco[10];
     float peso_saco;
 

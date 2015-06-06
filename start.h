@@ -1,5 +1,6 @@
 #ifndef START_H_
 #define START_H_
+
 #include "util.h"
 
 void random_start (void);

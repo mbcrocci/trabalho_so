@@ -1,4 +1,4 @@
-#include "user.h"
+#include "util.h"
 
 // (TODO): APAGAR DEPOIS
 // Percorre a lista de utilizadores  ligados e lista dos a jogar

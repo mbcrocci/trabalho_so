@@ -1,4 +1,4 @@
-#include "monster.h"
+#include "util.h"
 
 monstro_t new_monster(char *nome, int lin, int col)
 {

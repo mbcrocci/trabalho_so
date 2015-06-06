@@ -1,10 +1,10 @@
 #include <signal.h>
 
 #include "util.h"
-#include "object.h"
+/*#include "object.h"
 #include "user.h"
 #include "monster.h"
-#include "start.h"
+#include "start.h"*/
 
 void trata_sig (int i)
 {
@@ -170,7 +170,7 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Terminou o jogo");
 				// (TODO): Avisar todos os jogadores
 				// 		   e dizer quem tem mais moedas
-				
+
 				clear_game ();
 				n_us_play = 0;
 				game_started = 0;
@@ -189,15 +189,13 @@ int main (int argc, char *argv[])
 
 			show_saco (curr_user);
 
-
-		
 		} else if (!strcmp (req.command, "ver")) {
 			if (!user_is_playing (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao esta a jogar.");
 
 			else if (!strcmp (req.argument[0], "")) {
 				strcpy (rep.buffer, "Sala:\n    Portas: ");
-				
+
 				for (i = 0; i < 4; i++)
 					if (labirinto[curr_user.lin][curr_user.col].portas[i] == 1) {
 						if (i == 0)
@@ -211,50 +209,47 @@ int main (int argc, char *argv[])
 				}
 
 				strcat (rep.buffer, "\n    Users: ");
-	
-				for (i = 0; i < n_us_play; i++) {
-					if (users_playing[i].lin == curr_user.lin
-							&& users_playing[i].col == curr_user.col) {
-						strcat (rep.buffer, users_playing[i].nome);
-						strcat (rep.buffer, " ");	
+
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++) {
+						strcat (rep.buffer,
+								labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
+						strcat (rep.buffer, " ");
 					}
-				}
-				
+
 				strcat (rep.buffer, "\nMonstros: ");
-				
-				for (i = 0; i < MAX_N_MONTROS; i++) {
-					if (monster_list[i].lin == curr_user.lin
-							&& monster_list[i].col == curr_user.col) {
-						strcat (rep.buffer, monster_list[i].nome);
-						strcat (rep.buffer, " ");	
-					}
+
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt;
+				     i++) {
+						strcat (rep.buffer,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].nome);
+						strcat (rep.buffer, " ");
 				}
-				
+
 				strcat (rep.buffer, "\nObjectos: ");
 				for (i = 0; i < OBJECT_NUMBER; i++) {
 					if (lab_object_list[i].lin == curr_user.lin
 							&& lab_object_list[i].col == curr_user.col) {
 						strcat (rep.buffer, lab_object_list[i].nome);
-						strcat (rep.buffer, " ");	
+						strcat (rep.buffer, " ");
 					}
 				}
-			
+
 				// (TODO): acabar comando
 
 			} else if (is_monster_name (req.argument[1])) {
 				strcpy (rep.buffer, "\nMonstros: ");
-				
-				for (i = 0; i < MAX_N_MONTROS; i++) {
-					if (monster_list[i].lin == curr_user.lin
-						&& monster_list[i].col == curr_user.col
-						&& !strcmp (req.argument[1], monster_list[i].nome)) {
 
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt; i++) {
 						strcpy (rep.buffer, "Descricao: ");
-						strcat (rep.buffer, monster_list[i].nome);
+						strcat (rep.buffer,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].nome);
+						strcat (rep.buffer, " ");
+
 						sprintf (rep.buffer, "%s\nHP: %d\nF_Ataque: %d\nF_Defesa: %d\n",
-							   	rep.buffer, monster_list[i].hp,
-							   	monster_list[i].atac, monster_list[i].def);
-					}
+								rep.buffer,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].hp,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].atac,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].def);
 				}
 
 			} else if (is_object_name (req.argument[1])) {
@@ -288,11 +283,11 @@ int main (int argc, char *argv[])
 					i = mover (curr_user.client_pid, 3);
 
 				if (i == 0) strcpy (rep.buffer, "Nao tem essa porta");
-				else { 
+				else {
 					// update user para ter nova possicao
 					curr_user = find_user (curr_user.client_pid);
-					sprintf (rep.buffer, 
-							"Encontra-se numa sala %s\nO que pretende fazer?", 
+					sprintf (rep.buffer,
+							"Encontra-se numa sala %s\nO que pretende fazer?",
 							labirinto[curr_user.lin][curr_user.col].descricao);
 				}
 			}
@@ -308,7 +303,7 @@ int main (int argc, char *argv[])
 						&& !strcmp (req.argument[1], lab_object_list[i].nome))
 
 						apanha_objecto (i, curr_user.client_pid);
-				
+
 				strcpy (rep.buffer, "Apanhou ");
 				strcat (rep.buffer, req.argument[1]);
 			}
@@ -331,9 +326,8 @@ int main (int argc, char *argv[])
 			n = write (client_fd, &rep, sizeof(rep));
  			printf ("[SERVIDOR] Enviei resposta ... (%d bytes)\n", n);
 			close (client_fd);
-		}	
+		}
 	}
-
 	fclose (user_fp);
 	close (server_fd);
 	unlink (SERVER_FIFO);

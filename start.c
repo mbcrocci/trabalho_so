@@ -1,4 +1,4 @@
-#include "start.h"
+#include "util.h"
 
 int used_number (int s, int *array)
 {
@@ -81,7 +81,6 @@ void random_start (void)
 			n_portas=0;
 		}
 	}
-	// decricoes (TODO): gerar para as seguites 50 salas
 	r = 0;
 	for (lin = 0; lin < 10; lin++) {
 		for (col = 0; col < 10; col++) {
@@ -104,43 +103,62 @@ void random_start (void)
 	s_inic_lin = random_number (0, 9);
 	s_inic_col = random_number (0, 9);
 
-	for (i = 0; i < 10; i++) {
-		// random sala
-		lin = random_number (0, 9);
-		col = random_number (0, 9);
+	for (i = 0; i < 40; i++) {
+		// random sala	
+		do {
+			lin = random_number (0, 9);
+			col = random_number (0, 9);
+		} while (labirinto[lin][col].n_obj == 2);
 
 		// random object
 		p = random_number (0, 7);
 		strcpy (obj_name, obj_names[p]);
 
-		lab_object_list[i] = new_object (obj_name, lin, col);
+		labirinto[lin][col].objectos[labirinto[lin][col].n_obj] = new_object (
+				obj_name, lin, col);
 	}
 
 	for(i = 0; i < MAX_N_MONTROS; i++){
-		lin = random_number (0, 9);
-		col = random_number (0, 9);
+		do {
+			lin = random_number (0, 9);
+			col = random_number (0, 9);
+		} while (labirinto[lin][col].n_mnt == 2);
 
 		// 10 morcegos
-		if(i < 10)
-			monster_list[i] = new_monster ("morcego", lin, col);
+		if(i < 10) {
+			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
+					"morcego", lin, col);
+			labirinto[lin][col].n_mnt++;
+		}
 
 		// 10 escorpioes
-		else if(9 < i && i < 20)
-			monster_list[i] = new_monster ("escorpiao", lin, col);
+		else if(9 < i && i < 20) {
+			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
+					"escorpiao", lin, col);
+			labirinto[lin][col].n_mnt++;
+		}
 
 		// 5 lobisomens
-		else if(19 < i && i < 24)
-			monster_list[i] = new_monster ("lobisomem", lin, col);
+		else if(19 < i && i < 24) {
+			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
+					"lobisomem", lin, col);
+			labirinto[lin][col].n_mnt++;
+		}
 
 		// 3 ursos
-		else if(i < 23 && i < 25)
-			monster_list[i] = new_monster ("urso", lin, col);
+		else if(i < 23 && i < 25) {
+			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
+					"urso", lin, col);
+			labirinto[lin][col].n_mnt++;
+		}
 
 		// 1 boss
-		else if(i == 25)
-			monster_list[i] = new_monster ("boss", lin, col);
+		else if(i == 25) {
+			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
+					"boss", lin, col);
+			labirinto[lin][col].n_mnt++;
+		}
 	}
-
 	show_all_monsters_objects();
 }
 

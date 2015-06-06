@@ -1,4 +1,4 @@
-#include "object.h"
+#include "util.h"
 
 object_t new_object (char name[10], int lin, int col)
 {
