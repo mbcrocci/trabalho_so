@@ -72,6 +72,10 @@ int main (int argc, char *argv[])
 		// (TODO): remover
 		show_user_list ();
 
+		// manter o alarm a 0 enquanto o jogo nao comecar
+		if (!game_started)
+			N_SEG = 0;
+
 		// clear buffers
 		memset (&req.command[0], 0, sizeof (req.command));
 		for (i = 0; i < 3; i++)
@@ -119,7 +123,7 @@ int main (int argc, char *argv[])
 
 			else {
 				// (TODO): start timeout
-				signal (14, start_timer);
+				signal (SIGALRM, start_timer);
 				alarm(1);
 				timeout = atoi (req.argument[0]);
 
@@ -184,6 +188,7 @@ int main (int argc, char *argv[])
 				clear_game ();
 				n_us_play = 0;
 				game_started = 0;
+				N_SEG = 0;
 			}
 		} else if (!strcmp (req.command, "desistir")){
 			if (user_is_playing (curr_user.client_pid)) {
