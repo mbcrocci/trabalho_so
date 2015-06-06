@@ -302,7 +302,10 @@ int main (int argc, char *argv[])
 				strcat (rep.buffer, req.argument[1]);
 			}
 		} else if(!strcmp (req.command, "diz")) {
-			if (!strcmp (req.argument[0], ""))
+			if (!user_is_playing(curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta a jogar");
+			
+			else if (!strcmp (req.argument[0], ""))
 				strcpy (rep.buffer, "Nao disse nada");
 
 			else {
@@ -314,7 +317,7 @@ int main (int argc, char *argv[])
 						kill (users_playing[i].client_pid, SIGUSR1);
 						strcpy (alert_rep.buffer, req.argument[0]);
 
-						if (access ("alert_fifo", F_OK) == 0)
+						if (access ("alert_fifo", F_OK) != 0)
 							mkfifo ("alert_fifo", 0600);
 
 						alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);

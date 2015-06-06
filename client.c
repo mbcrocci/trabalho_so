@@ -8,7 +8,7 @@ void read_alert (int s)
 	alert_fifo = open ("alert_fifo", O_RDONLY | O_NONBLOCK);
 	read (alert_fifo, &rep, sizeof(rep));
 
-	fprintf (stderr, "\n%s\n>> ", rep.buffer);
+	fprintf(stderr, "\nMensagem: %s\n>> ", rep.buffer);
 }
 
 int main (void)
@@ -135,11 +135,12 @@ int main (void)
 			if (!strcmp (word[0], "diz")) {
 				strcpy (req.command, "diz");
 				if (word[1] != NULL) {
-					i = 1;
-					while (word[i] != NULL) {
-						strcat (req.argument[0], word[i]);
-						i++;
-					}
+					strcpy (req.argument[0], word[1]);
+					//i = 1;
+					// while (word[i] != NULL) {
+					//	strcat (req.argument[0], word[i]);
+					// i++;
+					//}
 				}
 			}
 
