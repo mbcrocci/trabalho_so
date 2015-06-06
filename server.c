@@ -221,8 +221,10 @@ int main (int argc, char *argv[])
 				strcat (rep.buffer, "\n    Users: ");
 				for (i = 0; i < n_us_play; i++) {
 				    if (users_playing[i].lin == curr_user.lin
-						&& users_playing[i].col == curr_user.col)
+						&& users_playing[i].col == curr_user.col) {
 						strcat (rep.buffer, users_playing[i].nome);
+						strcat (rep.buffer, " ");
+					}
 				}
 
 				strcat (rep.buffer, "\nMonstros: ");
@@ -300,11 +302,15 @@ int main (int argc, char *argv[])
 				strcat (rep.buffer, req.argument[1]);
 			}
 		} else if(!strcmp (req.command, "diz")) {
-			if (strcmp (req.argument[1], ""))
+			if (!strcmp (req.argument[0], ""))
 				strcpy (rep.buffer, "Nao disse nada");
 
 			else {
-				// (TODO): arranjar maneira de dizer a todos
+				for (i = 0; i < n_us_play; i++)
+					if (curr_user.client_pid != users_playing[i].client_pid
+						&& users_playing[i].lin == curr_user.lin
+						&& users_playing[i].col == curr_user.col)
+						kill (users_playing[i].client_pid, SIGUSR1);
 			}
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");

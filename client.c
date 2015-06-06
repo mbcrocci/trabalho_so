@@ -1,5 +1,10 @@
 #include "util.h"
 
+void read_alert (int s)
+{
+	printf ("RECEBI SIGUSR1\n");
+}
+
 int main (void)
 {
 	char str[BUFF_SIZE], *word[8]; // shell
@@ -46,6 +51,8 @@ int main (void)
 	client_fd = open (req.endereco, O_RDONLY);
 	read (client_fd, &rep, sizeof (rep));
 	close (client_fd);
+	
+	signal (SIGUSR1, read_alert);
 
 	if (strcmp (rep.buffer, "AUTHENTICATED")) {
 		fprintf (stderr, "Username ou  Password incorretos\n");
@@ -121,19 +128,20 @@ int main (void)
 
 			if (!strcmp (word[0], "diz")) {
 				strcpy (req.command, "diz");
-				if (word[1] != NULL)
-					strcpy (req.argument[0], word[1]);
-
-				if (word[2] != NULL)
-					strcpy (req.argument[1], word[2]);
+				if (word[1] != NULL) {
+					i = 1;
+					while (word[i] != NULL) {
+						strcat (req.argument[0], word[i]);
+						i++;
+					}
+				}
 			}
 
 			if (!strcmp (word[0], "apanha")){
 				strcpy (req.command, "apanha");
 				if (word[1] != NULL)
 					strcpy (req.argument[0], word[1]);
-			}
-			
+			}	
 
 			// send request
 			n = write (server_fd, &req, sizeof (req));

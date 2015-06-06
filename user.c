@@ -168,3 +168,15 @@ int mover (pid_t client_pid, int p)
 	}
 	return 1;
 }
+
+void send_alert (pid_t pid, char mess[80])
+{
+	response_t rep;
+	char end[10];
+	int fd;
+	sprintf (end, "client_%d_fifo", pid);
+	strcpy (rep.buffer, mess);
+	fd = open (end, O_WRONLY);
+	write (fd, &rep, sizeof(rep));
+	close (fd);
+}
