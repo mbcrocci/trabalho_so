@@ -2,7 +2,13 @@
 
 void read_alert (int s)
 {
-	printf ("RECEBI SIGUSR1\n");
+	int alert_fifo;
+	response_t rep;
+
+	alert_fifo = open ("alert_fifo", O_RDONLY | O_NONBLOCK);
+	read (alert_fifo, &rep, sizeof(rep));
+
+	fprintf (stderr, "\n%s\n>> ", rep.buffer);
 }
 
 int main (void)

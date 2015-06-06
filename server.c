@@ -30,12 +30,12 @@ int main (int argc, char *argv[])
 
 	FILE *user_fp;
 
-	int self_fifo;
+	int self_fifo, alert_fifo;
 
 	user_t curr_user;
 
 	request_t req;
-	response_t rep;
+	response_t rep, alert_rep;
 
 	if (signal (SIGINT, terminate) == SIG_ERR) {
 		perror ("[ERRO] - Impossivel configurar SIGINT\n");
@@ -309,8 +309,20 @@ int main (int argc, char *argv[])
 				for (i = 0; i < n_us_play; i++)
 					if (curr_user.client_pid != users_playing[i].client_pid
 						&& users_playing[i].lin == curr_user.lin
-						&& users_playing[i].col == curr_user.col)
+						&& users_playing[i].col == curr_user.col) {
+
 						kill (users_playing[i].client_pid, SIGUSR1);
+						strcpy (alert_rep.buffer, req.argument[0]);
+
+						if (access ("alert_fifo", F_OK) == 0)
+							mkfifo ("alert_fifo", 0600);
+
+						alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
+						write (alert_fifo, &alert_rep, sizeof(alert_rep));
+						close (alert_fifo);
+						
+					}
+						
 			}
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
