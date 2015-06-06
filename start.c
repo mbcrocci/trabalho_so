@@ -228,18 +228,31 @@ void read_start_file (char *filename)
 
 void show_all_monsters_objects(void)
 {
-	int i;
+	int l, c, m, o;
 	char print[1000];
+	char coor[5];
 	strcat (print, "MONSTROS\n");
-	for (i = 0; i < MAX_N_MONTROS; i++) {
-		strcat (print, monster_list[i].nome);
-		strcat (print, "\n");
+	for (l = 0; l < 10; l++) {
+		for (c = 0; c < 10; c++) {
+			for (m = 0; m < labirinto[l][c].n_mnt; m++){
+				strcat (print, labirinto[l][c].monstros[m].nome);
+				sprintf (coor, " %d %d", l, c);
+				strcat (print, coor);
+				strcat (print, "\n");
+			}
+		}
 	}
 
 	strcat (print, "\nOBJECTOS\n");
-	for (i = 0; i < OBJECT_NUMBER; i++) {
-		strcat (print, lab_object_list[i].nome);
-		strcat (print, "\n");
+	for (l = 0; l < 10; l++) {
+		for (c = 0; c < 10; c++) {
+			for (o = 0; o < labirinto[l][c].n_obj; o++){
+				strcat (print, labirinto[l][c].objectos[o].nome);
+				sprintf (coor, " %d %d", l, c);
+				strcat (print, coor);
+				strcat (print, "\n");
+			}
+		}
 	}
 	strcat (print, "\0");
 	fprintf (stderr, "%s\n", print);

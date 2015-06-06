@@ -1,10 +1,6 @@
 #include <signal.h>
 
 #include "util.h"
-/*#include "object.h"
-#include "user.h"
-#include "monster.h"
-#include "start.h"*/
 
 void trata_sig (int i)
 {
@@ -209,15 +205,13 @@ int main (int argc, char *argv[])
 				}
 
 				strcat (rep.buffer, "\n    Users: ");
-
-				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++) {
-						strcat (rep.buffer,
-								labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
-						strcat (rep.buffer, " ");
-					}
-
+				for (i = 0; i < n_us_play; i++) {
+				    if (users_playing[i].lin == curr_user.lin
+						&& users_playing[i].col == curr_user.col)
+						strcat (rep.buffer, users_playing[i].nome);
+				}
+				
 				strcat (rep.buffer, "\nMonstros: ");
-
 				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt;
 				     i++) {
 						strcat (rep.buffer,
@@ -226,15 +220,13 @@ int main (int argc, char *argv[])
 				}
 
 				strcat (rep.buffer, "\nObjectos: ");
-				for (i = 0; i < OBJECT_NUMBER; i++) {
-					if (lab_object_list[i].lin == curr_user.lin
-							&& lab_object_list[i].col == curr_user.col) {
-						strcat (rep.buffer, lab_object_list[i].nome);
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++) {
+						strcat (rep.buffer,
+								labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
 						strcat (rep.buffer, " ");
 					}
-				}
 
-				// (TODO): acabar comando
+			// (TODO): acabar comando
 
 			} else if (is_monster_name (req.argument[1])) {
 				strcpy (rep.buffer, "\nMonstros: ");
@@ -297,11 +289,9 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Comando Incompleto");
 
 			else {
-				for (i = 0; i < 10; i++)
-					if (lab_object_list[i].lin == curr_user.lin
-						&& lab_object_list[i].col == curr_user.col
-						&& !strcmp (req.argument[1], lab_object_list[i].nome))
-
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++)
+					if (!strcmp (req.argument[0],
+					labirinto[curr_user.lin][curr_user.col].objectos[i].nome))
 						apanha_objecto (i, curr_user.client_pid);
 
 				strcpy (rep.buffer, "Apanhou ");

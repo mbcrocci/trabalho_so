@@ -9,11 +9,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
-/*
-#include "object.h"
-#include "monster.h"
-#include "user.h"
-*/
+
 #include "start.h"
 
 #define SERVER_FIFO "server_fifo"
@@ -52,9 +48,6 @@ struct object {
 
 typedef struct object object_t;
 
-// tamanho 10 porque o ficheiro de criacao so especifica 10 obj
-object_t lab_object_list[10];
-
 extern char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE];
 
 // Funcoes de objectos
@@ -76,8 +69,6 @@ typedef struct {
     int lin, col;
 } monstro_t;
 
-// lista de monstros
-monstro_t monster_list[MAX_N_MONTROS];
 
 // funcoes de montros 
 monstro_t new_monster(char *nome, int lin, int col);
