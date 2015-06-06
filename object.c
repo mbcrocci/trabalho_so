@@ -62,9 +62,11 @@ object_t new_object (char name[10], int lin, int col)
 void apanha_objecto (int i, pid_t pid)
 {
 	int u;
+	user_t c;
 	u = find_user_index (pid);
+	c = find_user (pid);
 
-	user_list[u].saco[user_list[u].n_obj] = lab_object_list[i];
+	user_list[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];
 }
 
 

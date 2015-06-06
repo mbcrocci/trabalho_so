@@ -157,13 +157,13 @@ int mover (pid_t client_pid, int p)
 		return 0;
 
 	switch (p) {
-	case 1:
+	case 0:
 		update_position (client_pid, curr_user.lin-1, curr_user.col);
-	case 2:
+	case 1:
 		update_position (client_pid, curr_user.lin+1, curr_user.col);
-	case 3:
+	case 2:
 		update_position (client_pid, curr_user.lin, curr_user.col-1);
-	case 4:
+	case 3:
 		update_position (client_pid, curr_user.lin, curr_user.col+1);
 	}
 	return 1;

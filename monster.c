@@ -72,7 +72,7 @@ int is_monster_name (char name[10])
 		|| !strcmp (name, "lobisomem")
 		|| !strcmp (name, "urso")
 		|| !strcmp (name, "boss")
-	) return 1;
+	) return 0;
 
-	return 0;
+	return 1;
 }

@@ -217,7 +217,7 @@ void read_start_file (char *filename)
 		if (f_lin == 30)
 			break;
 
-		lab_object_list[o] = new_object (o_name, o_lin, o_col);
+		labirinto[o_lin][o_col].objectos[labirinto[o_lin][o_col].n_obj] = new_object (o_name, o_lin, o_col);
 		f_lin++;
 	}
 

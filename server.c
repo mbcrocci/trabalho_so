@@ -2,7 +2,9 @@
 
 #include "util.h"
 
-void trata_sig (int i)
+int N_SEG = 0;
+
+void terminate (int i)
 {
 	fprintf (stderr, "\nSERVER TERMINATING\n");
 
@@ -11,9 +13,15 @@ void trata_sig (int i)
 	exit (EXIT_SUCCESS);
 }
 
+void start_timer (int s)
+{
+	N_SEG++;
+	alarm(1);
+}
+
 int main (int argc, char *argv[])
 {
-	int n, i;
+	int n, i, timeout;
 	char response[REP_BUFF_SIZE], aviso_end[BUFF_SIZE];
 	char username[10], password[10];
 	char line[20];
@@ -29,7 +37,7 @@ int main (int argc, char *argv[])
 	request_t req;
 	response_t rep;
 
-	if (signal (SIGINT, trata_sig) == SIG_ERR) {
+	if (signal (SIGINT, terminate) == SIG_ERR) {
 		perror ("[ERRO] - Impossivel configurar SIGINT\n");
 		exit (EXIT_FAILURE);
 	}
@@ -111,6 +119,10 @@ int main (int argc, char *argv[])
 
 			else {
 				// (TODO): start timeout
+				signal (14, start_timer);
+				alarm(1);
+				timeout = atoi (req.argument[0]);
+
 				i = atoi (req.argument[1]); // esta a converter bem
 				if (i < 10){
 					random_start ();
@@ -124,7 +136,9 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
 			}
 		} else if (!strcmp (req.command, "jogar")) {
-			if (!game_started)
+			if (N_SEG > timeout)
+				strcpy (rep.buffer, "Ja nao pode jogar, espere ate o jogador q comece um novo jogo");
+			else if (!game_started)
 				strcpy (rep.buffer, "O Jogo ainda nao comecou, utilize o comando \"novo\" para comecar");
 
 			else {
@@ -210,10 +224,9 @@ int main (int argc, char *argv[])
 						&& users_playing[i].col == curr_user.col)
 						strcat (rep.buffer, users_playing[i].nome);
 				}
-				
+
 				strcat (rep.buffer, "\nMonstros: ");
-				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt;
-				     i++) {
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt; i++) {
 						strcat (rep.buffer,
 								labirinto[curr_user.lin][curr_user.col].monstros[i].nome);
 						strcat (rep.buffer, " ");
@@ -224,38 +237,27 @@ int main (int argc, char *argv[])
 						strcat (rep.buffer,
 								labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
 						strcat (rep.buffer, " ");
-					}
-
-			// (TODO): acabar comando
-
+				}
 			} else if (is_monster_name (req.argument[1])) {
-				strcpy (rep.buffer, "\nMonstros: ");
-
 				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt; i++) {
-						strcpy (rep.buffer, "Descricao: ");
-						strcat (rep.buffer,
-								labirinto[curr_user.lin][curr_user.col].monstros[i].nome);
-						strcat (rep.buffer, " ");
+					if (!strcmp (req.argument[1], labirinto[curr_user.lin][curr_user.col].monstros[i].nome)) {
 
-						sprintf (rep.buffer, "%s\nHP: %d\nF_Ataque: %d\nF_Defesa: %d\n",
-								rep.buffer,
+						sprintf (rep.buffer, "HP: %d\nF_Ataque: %d\nF_Defesa: %d\n",
 								labirinto[curr_user.lin][curr_user.col].monstros[i].hp,
 								labirinto[curr_user.lin][curr_user.col].monstros[i].atac,
 								labirinto[curr_user.lin][curr_user.col].monstros[i].def);
-				}
-
-			} else if (is_object_name (req.argument[1])) {
-				for (i = 0; i < OBJECT_NUMBER; i++) {
-					if (lab_object_list[i].lin == curr_user.lin
-						&& lab_object_list[i].col == curr_user.col
-						&& !strcmp (req.argument[1], lab_object_list[i].nome)) {
-
-						strcpy (rep.buffer, "Descricao: ");
-						strcat (rep.buffer, lab_object_list[i].nome);
-						sprintf (rep.buffer, "%s Peso: %f", rep.buffer, lab_object_list[i].peso);
 					}
 				}
-			}
+			} else if (is_object_name (req.argument[1])) {
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++) {
+					if (!strcmp (req.argument[1], labirinto[curr_user.lin][curr_user.col].objectos[i].nome)) {
+						strcpy  (rep.buffer, labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
+						strcat (rep.buffer, "\nPeso: ");
+						sprintf (rep.buffer, "%s %f", rep.buffer,
+						   	labirinto[curr_user.lin][curr_user.col].objectos[i].peso);
+					}
+				}
+			} else strcpy (rep.buffer, "Nao existe na sala");
 		} else if (!strcmp (req.command, "mover")) {
 			if (!user_is_playing (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao esta a jogar");
