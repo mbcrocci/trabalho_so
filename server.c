@@ -327,6 +327,18 @@ int main (int argc, char *argv[])
 					}
 						
 			}
+		} else if (!strcmp (req.command, "quem")) {
+			strcpy (rep.buffer, "\nUtilizadores logados: ");
+			for(i = 0; i < n_user; i++){
+				strcat (rep.buffer, user_list[i].nome);
+				strcat (rep.buffer, " ");
+			}
+			strcat (rep.buffer, "\nUtilizadores a jogar: ");
+			for (i = 0; i < n_us_play; i++) { 
+				strcat (rep.buffer, users_playing[i].nome);
+				strcat (rep.buffer, " ");
+			}
+
 		} else {
 			strcpy (rep.buffer, "Commando Invalido!!!");
 		}

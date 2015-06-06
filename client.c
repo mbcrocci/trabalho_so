@@ -1,3 +1,4 @@
+#include <signal.h>
 #include "util.h"
 
 void read_alert (int s)
@@ -131,6 +132,9 @@ int main (void)
 
 			if (!strcmp (word[0], "info"))
 				strcpy (req.command, "info");
+
+			if (!strcmp (word[0], "quem"))
+				strcpy (req.command, "quem");
 
 			if (!strcmp (word[0], "diz")) {
 				strcpy (req.command, "diz");
