@@ -147,13 +147,6 @@ void update_position (pid_t client_pid, int lin, int col)
 	}
 }
 
-void show_saco (user_t curr_user)
-{
-    int i;
-    for (i = 0; i < 10; i++)
-        printf("%s\n", curr_user.saco[i].nome);
-}
-
 int mover (pid_t client_pid, int p)
 {
 	user_t curr_user;

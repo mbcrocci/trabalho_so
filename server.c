@@ -281,7 +281,6 @@ int main (int argc, char *argv[])
 					strcat (rep.buffer, curr_user.saco[i].nome);
 					strcat (rep.buffer, " ");
 				}
-				show_saco (curr_user);
 			} else strcpy (rep.buffer, "Nao esta a jogar");
 
 		} else if (!strcmp (req.command, "ver")) {
@@ -390,6 +389,28 @@ int main (int argc, char *argv[])
 					} else
 						strcpy (rep.buffer, "Objecto nao existe na sala");
 				}
+			}
+		} else if (!strcmp (req.command, "larga")) {
+			if (!user_is_playing (curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta a jogar");
+
+			else if (!strcmp (req.argument[0], ""))
+				strcpy (rep.buffer, "Comando Incompleto");
+
+			else {
+				for (i = 0; i < curr_user.n_obj; i++) {
+					if (!strcmp (req.argument[0], curr_user.saco[i].nome)) {
+					
+						larga_objecto (i, curr_user.client_pid);
+
+						strcpy (rep.buffer, "Largou ");
+						strcat (rep.buffer, req.argument[1]);
+						break;
+					} else
+						strcpy (rep.buffer, "Objecto nao existe no saco");
+				}
+
+
 			}
 		} else if(!strcmp (req.command, "diz")) {
 			if (!user_is_playing(curr_user.client_pid))

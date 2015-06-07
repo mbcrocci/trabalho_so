@@ -56,6 +56,8 @@ object_t new_object (char name[10], int lin, int col);
 int is_object_name (char name[10]);
 void apanha_objecto (int i, pid_t client_pid);
 void remove_object_sala (int i, int lin, int col);
+void larga_objecto (int i, pid_t pid);
+void remove_object_saco (int i, pid_t pid);
 
 // MONSTROS
 #define MAX_N_MONTROS 27
@@ -130,7 +132,6 @@ void remove_user (pid_t client_pid);
 void remove_user_playing (pid_t client_pid);
 void clear_game (void);
 void update_position (pid_t client_pid, int lin, int col);
-void show_saco (user_t curr_user);
 int mover (pid_t client_pid, int p);
 void send_alert (pid_t pid, char mess[80]);
 

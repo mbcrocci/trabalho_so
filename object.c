@@ -69,6 +69,8 @@ void apanha_objecto (int i, pid_t pid)
 	// copiar o objecto da sala para o utilizador correspondente
 	// tanto na lista de utilizadores como da dos que estao a jogar
 	user_list[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];	
+
+	u = find_user_playing_index (pid);
 	users_playing[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];
 
 	user_list[i].n_obj++; users_playing[i].n_obj++;
@@ -86,6 +88,42 @@ void remove_object_sala (int i, int lin, int col)
 			0, sizeof (object_t));
 
 	labirinto[lin][col].n_obj--;
+}
+
+void larga_objecto (int i, pid_t pid)
+{
+	user_t c;
+	c = find_user (pid);
+
+	if (labirinto[c.lin][c.col].n_obj == 5)
+		remove_object_saco (i, pid);
+
+	else {
+		labirinto[c.lin][c.col].objectos[labirinto[c.lin][c.col].n_obj] =
+			c.saco[i];
+		labirinto[c.lin][c.col].n_obj++;
+
+		remove_object_saco (i, pid);
+	}
+}
+
+void remove_object_saco (int i, pid_t pid)
+{
+	int j, u, p;
+	user_t c;
+	u = find_user_index (pid);
+	p = find_user_playing_index (pid);
+	c = find_user (pid);
+
+	for (j = i; j < c.n_obj-1; j++)
+		user_list[u].saco[j] = user_list[u].saco[j+1];
+	memset (&user_list[u].saco[c.n_obj], 0, sizeof (object_t));
+
+	for (j = i; j < c.n_obj-1; j++)
+		users_playing[p].saco[j] = users_playing[p].saco[j+1];
+	memset (&users_playing[p].saco[c.n_obj], 0, sizeof (object_t));
+
+	user_list[u].n_obj--; users_playing[p].n_obj--;
 }
 
 
