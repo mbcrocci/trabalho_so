@@ -314,8 +314,8 @@ int main (int argc, char *argv[])
 						&& users_playing[i].lin == curr_user.lin
 						&& users_playing[i].col == curr_user.col) {
 
-						kill (users_playing[i].client_pid, SIGUSR1);
 						strcpy (alert_rep.buffer, req.argument[0]);
+
 
 						if (access ("alert_fifo", F_OK) != 0)
 							mkfifo ("alert_fifo", 0600);
@@ -323,6 +323,8 @@ int main (int argc, char *argv[])
 						alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
 						write (alert_fifo, &alert_rep, sizeof(alert_rep));
 						close (alert_fifo);
+
+						kill (users_playing[i].client_pid, SIGUSR1);
 						
 					}
 						
