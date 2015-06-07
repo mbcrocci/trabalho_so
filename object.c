@@ -66,7 +66,26 @@ void apanha_objecto (int i, pid_t pid)
 	u = find_user_index (pid);
 	c = find_user (pid);
 
-	user_list[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];
+	// copiar o objecto da sala para o utilizador correspondente
+	// tanto na lista de utilizadores como da dos que estao a jogar
+	user_list[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];	
+	users_playing[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];
+
+	user_list[i].n_obj++; users_playing[i].n_obj++;
+
+	remove_object_sala (i, c.lin, c.col);	
+}
+
+void remove_object_sala (int i, int lin, int col)
+{
+	int j;
+	for (j = i; j < labirinto[lin][col].n_obj - 1; j++)
+		labirinto[lin][col].objectos[j] = labirinto[lin][col].objectos[j+1];
+
+	memset (&labirinto[lin][col].objectos[labirinto[lin][col].n_obj],
+			0, sizeof (object_t));
+
+	labirinto[lin][col].n_obj--;
 }
 
 

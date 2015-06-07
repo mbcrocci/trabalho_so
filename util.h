@@ -55,7 +55,7 @@ extern char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE];
 object_t new_object (char name[10], int lin, int col);
 int is_object_name (char name[10]);
 void apanha_objecto (int i, pid_t client_pid);
-
+void remove_object_sala (int i, int lin, int col);
 
 // MONSTROS
 #define MAX_N_MONTROS 27

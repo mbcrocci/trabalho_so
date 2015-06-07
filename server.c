@@ -275,11 +275,14 @@ int main (int argc, char *argv[])
 				game_started = 0;
 
 		} else if (!strcmp (req.command, "info")) {
-			// (TODO): FIX BUG
-			sprintf (rep.buffer, "HP: %d\nSaco: %s, %s", curr_user.hp,
-					curr_user.saco[0].nome, curr_user.saco[1].nome);
-
-			show_saco (curr_user);
+			if (user_is_playing (curr_user.client_pid)) {
+				sprintf (rep.buffer, "HP: %d\nSaco: ", curr_user.hp);
+				for (i = 0; i < curr_user.n_obj; i++) {
+					strcat (rep.buffer, curr_user.saco[i].nome);
+					strcat (rep.buffer, " ");
+				}
+				show_saco (curr_user);
+			} else strcpy (rep.buffer, "Nao esta a jogar");
 
 		} else if (!strcmp (req.command, "ver")) {
 			if (!user_is_playing (curr_user.client_pid))
@@ -375,13 +378,18 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Comando Incompleto");
 
 			else {
-				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++)
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++) {
 					if (!strcmp (req.argument[0],
-					labirinto[curr_user.lin][curr_user.col].objectos[i].nome))
+								labirinto[curr_user.lin][curr_user.col].objectos[i].nome)) {
+					
 						apanha_objecto (i, curr_user.client_pid);
 
-				strcpy (rep.buffer, "Apanhou ");
-				strcat (rep.buffer, req.argument[1]);
+						strcpy (rep.buffer, "Apanhou ");
+						strcat (rep.buffer, req.argument[1]);
+						break;
+					} else
+						strcpy (rep.buffer, "Objecto nao existe na sala");
+				}
 			}
 		} else if(!strcmp (req.command, "diz")) {
 			if (!user_is_playing(curr_user.client_pid))
