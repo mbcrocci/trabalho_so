@@ -33,6 +33,9 @@ int main (int argc, char *argv[])
 
 	int self_fifo, alert_fifo;
 
+	// variaveis para ver quem tem mais moedas
+	int moedas=0, m_moedas=0, i_moedas=0, s;
+
 	user_t curr_user;
 
 	request_t req;
@@ -134,6 +137,8 @@ int main (int argc, char *argv[])
 				alarm(1);
 				timeout = atoi (req.argument[0]);
 
+				moedas++;
+
 				i = atoi (req.argument[1]);
 				if (i < 10){
 					random_start ();
@@ -144,7 +149,15 @@ int main (int argc, char *argv[])
 					game_started = 1;
 				}
 
-				// (TODO): AVISAR TODOS OS UTILIZADORES
+				// Avisar todos os utilizadores
+				strcpy (alert_rep.buffer, "Aviso: novo jogo criado utilize o comando \"jogar\" para comecar");
+				alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
+				write (alert_fifo, &alert_rep, sizeof (alert_rep));
+				close (alert_fifo);
+
+				for (i = 0; i < n_user; i++)
+					kill (user_list[i].client_pid, SIGUSR1);
+
 				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
 			}
 		} else if (!strcmp (req.command, "jogar")) {
@@ -190,8 +203,27 @@ int main (int argc, char *argv[])
 				        "nao pode terminar o jogo");
 			else {
 				strcpy (rep.buffer, "Terminou o jogo");
-				// (TODO): Avisar todos os jogadores
-				// 		   e dizer quem tem mais moedas
+				strcpy (alert_rep.buffer, "O Jogador 1 terminou o jogo.");
+
+				for (i = 0; i < n_us_play; i++) {
+					for (s = 0; i < users_playing[i].n_obj; i++)
+						if (!strcmp (users_playing[i].saco[s].nome, "moeda"))
+							moedas++;
+					if (m_moedas < moedas) {
+						m_moedas = moedas;
+						i_moedas = i;
+					}
+					moedas = 0;
+				}
+				strcat (alert_rep.buffer, " Jogador com mais moedas: ");
+				strcat (alert_rep.buffer, users_playing[i_moedas].nome);
+
+				alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
+				write (alert_fifo, &alert_rep, sizeof (alert_rep));
+				close (alert_fifo);
+
+				for (i = 0; i < n_us_play; i++)
+					kill (users_playing[i].client_pid, SIGUSR1);
 
 				clear_game ();
 
