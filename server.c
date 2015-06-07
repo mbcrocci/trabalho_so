@@ -361,7 +361,9 @@ int main (int argc, char *argv[])
 		}
 	}
 	fclose (user_fp);
+
 	close (server_fd);
+	unlink ("alert_fifo");
 	unlink (SERVER_FIFO);
 	return 0;
 }

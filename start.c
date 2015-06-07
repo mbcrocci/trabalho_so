@@ -160,7 +160,7 @@ void random_start (void)
 			labirinto[lin][col].n_mnt++;
 		}
 	}
-	show_all_monsters_objects();
+	//show_all_monsters_objects();
 }
 
 void read_start_file (char *filename)
