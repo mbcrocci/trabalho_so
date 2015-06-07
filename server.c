@@ -93,6 +93,7 @@ int main (int argc, char *argv[])
 			memset (&req.argument[i][0], 0, sizeof (req.argument[i]));
 
 		memset (&rep.buffer[0], 0, sizeof (rep.buffer));
+		memset (&rep.buffer[0], 0, sizeof (alert_rep.buffer));
 
 		// READ REQUEST
 		n = read (server_fd, &req, sizeof (req));
@@ -156,7 +157,8 @@ int main (int argc, char *argv[])
 				close (alert_fifo);
 
 				for (i = 0; i < n_user; i++)
-					kill (user_list[i].client_pid, SIGUSR1);
+					if (user_list[i].client_pid != curr_user.client_pid)
+						kill (user_list[i].client_pid, SIGUSR1);
 
 				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
 			}
@@ -184,10 +186,24 @@ int main (int argc, char *argv[])
 
 			else {
 				strcpy (rep.buffer, "Saiu do jogo");
-				// (TODO): Avisar todos os jogadores
-				// 		  e dizer quem saiu e quantas moeads tinha
-				clear_game ();
+				strcpy (alert_rep.buffer, "O jogador ");
+				strcat (alert_rep.buffer, curr_user.nome);
+				strcat (alert_rep.buffer, " saiu do jogo e tinha ");
 
+				moedas = 0;
+				for (i = 0; i < curr_user.n_obj; i++)
+					if (!strcmp (curr_user.saco[i].nome, "moeda"))
+						moedas = 0;
+
+				sprintf (alert_rep.buffer, "%s%d moedas", alert_rep.buffer, moedas);
+				alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
+				write (alert_fifo, &alert_rep, sizeof (alert_rep));
+				close (alert_fifo);
+
+				for (i = 0; i < n_us_play; i++)
+					kill (users_playing[i].client_pid, SIGUSR1);
+
+				clear_game ();
 				n_us_play = 0;
 				game_started = 0;
 			}

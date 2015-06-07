@@ -11,6 +11,8 @@ void read_alert (int s)
 
 	fprintf(stderr, " %s\n>> ", rep.buffer);
 	close (alert_fifo);
+
+	memset (&rep.buffer[0], 0, sizeof(rep.buffer));
 }
 
 int main (void)
