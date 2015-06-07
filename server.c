@@ -411,7 +411,7 @@ int main (int argc, char *argv[])
 
 			}
 
-		} else if (!strcmp (req.command, "larga")) {
+		} else if (!strcmp (req.command, "usa")) {
 			if (!user_is_playing (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao esta a jogar");
 
