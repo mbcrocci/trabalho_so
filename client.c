@@ -170,6 +170,12 @@ int main (void)
 					strcpy (req.argument[0], word[1]);
 			}
 
+			if (!strcmp (word[0], "usa")) {
+				strcpy (req.command, "usa");
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]);
+			}
+
 			// send request
 			n = write (server_fd, &req, sizeof (req));
 

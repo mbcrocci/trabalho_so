@@ -58,6 +58,7 @@ void apanha_objecto (int i, pid_t client_pid);
 void remove_object_sala (int i, int lin, int col);
 void larga_objecto (int i, pid_t pid);
 void remove_object_saco (int i, pid_t pid);
+void usa_objecto (int i, pid_t pid);
 
 // MONSTROS
 #define MAX_N_MONTROS 27
