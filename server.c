@@ -122,19 +122,19 @@ int main (int argc, char *argv[])
 					"Utilize o comando [jogar] para entrar");
 
 			else {
-				// (TODO): start timeout
 				signal (SIGALRM, start_timer);
 				alarm(1);
 				timeout = atoi (req.argument[0]);
 
-				i = atoi (req.argument[1]); // esta a converter bem
+				i = atoi (req.argument[1]);
 				if (i < 10){
 					random_start ();
 					game_started = 1;
 				}
-				else
+				else {
 					read_start_file (req.argument[1]);
 					game_started = 1;
+				}
 
 				// (TODO): AVISAR TODOS OS UTILIZADORES
 				strcpy (rep.buffer, "Novo jogo criado. Use o comando \"jogar\", para comecar");
@@ -186,9 +186,12 @@ int main (int argc, char *argv[])
 				// 		   e dizer quem tem mais moedas
 
 				clear_game ();
+
+				// meter o labirinto a zero (para o server nao crashar)
+				memset(labirinto, 0, sizeof(labirinto[0][0]) * 10 * 10);
+
 				n_us_play = 0;
 				game_started = 0;
-				N_SEG = 0;
 			}
 		} else if (!strcmp (req.command, "desistir")){
 			if (user_is_playing (curr_user.client_pid)) {
@@ -314,25 +317,22 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Nao disse nada");
 
 			else {
+				if (access ("alert_fifo", F_OK) != 0)
+					mkfifo ("alert_fifo", 0600);
+
+				strcpy (alert_rep.buffer, req.argument[0]);
+
 				for (i = 0; i < n_us_play; i++)
 					if (curr_user.client_pid != users_playing[i].client_pid
 						&& users_playing[i].lin == curr_user.lin
 						&& users_playing[i].col == curr_user.col) {
-
-						strcpy (alert_rep.buffer, req.argument[0]);
-
-
-						if (access ("alert_fifo", F_OK) != 0)
-							mkfifo ("alert_fifo", 0600);
-
 						alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
-						write (alert_fifo, &alert_rep, sizeof(alert_rep));
-						close (alert_fifo);
-
+						write (alert_fifo, &alert_rep, sizeof (alert_rep));
 						kill (users_playing[i].client_pid, SIGUSR1);
-						
-					}
-						
+						close (alert_fifo);
+	
+				}
+
 			}
 		} else if (!strcmp (req.command, "quem")) {
 			strcpy (rep.buffer, "\nUtilizadores logados: ");
