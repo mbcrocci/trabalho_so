@@ -68,7 +68,19 @@ void apanha_objecto (int i, pid_t pid)
 
 	user_list[u].saco[user_list[u].n_obj] = labirinto[c.lin][c.col].objectos[i];
 }
-
+//usa objecto
+int usa_objecto (char nome[10], pid_t pid){
+	int i, index, o_index;
+	index = find_user_index (pid);
+	for(i = 0; i < user_list[index].n_obj; i++){
+		if (!strcmp (nome, user_list[index].saco[i].nome)){
+			user_list[index].hp += user_list[index].saco[i].hp_diff;
+		}return 1;
+		else{
+			printf("objecto nao exsiste\n");
+		}return 0;
+	}
+}
 
 int is_object_name (char name[10])
 {
