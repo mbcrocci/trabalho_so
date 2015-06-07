@@ -3,10 +3,10 @@
 
 void read_alert (int s)
 {
-	int alert_fifo;
 	response_t rep;
+	int alert_fifo;
 
-	alert_fifo = open ("alert_fifo", O_RDONLY | O_NONBLOCK);
+	alert_fifo = open (ALERT_FIFO, O_RDONLY | O_NONBLOCK);
 	read (alert_fifo, &rep, sizeof(rep));
 
 	fprintf(stderr, " Mensagem: %s\n>> ", rep.buffer);
@@ -158,6 +158,7 @@ int main (void)
 			// send request
 			n = write (server_fd, &req, sizeof (req));
 
+			// read response
 			client_fd = open (req.endereco, O_RDONLY);
 
 			n = read (client_fd, &rep, sizeof (rep));

@@ -14,6 +14,7 @@
 
 #define SERVER_FIFO "server_fifo"
 #define CLIENT_FIFO "client_%d_fifo"
+#define ALERT_FIFO "alert_fifo"
 
 #define BUFF_SIZE 25
 #define REP_BUFF_SIZE 100

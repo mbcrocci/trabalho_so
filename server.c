@@ -64,6 +64,13 @@ int main (int argc, char *argv[])
 		perror ("\n[ERRO] - Impossivel abrir fifo do server");
 		exit (EXIT_FAILURE);
 	}
+	if (access (ALERT_FIFO, F_OK) != 0)
+		mkfifo (ALERT_FIFO, 0600);
+
+	alert_fifo = open(ALERT_FIFO, O_WRONLY | O_NONBLOCK);
+	// abrir para ler, pq se nao e preciso mandar comando diz 2 vezes
+	alert_fifo = open (ALERT_FIFO, O_RDONLY | O_NONBLOCK);
+
 	//manter ligado
 	self_fifo = open(SERVER_FIFO, O_WRONLY);
 
@@ -317,20 +324,17 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Nao disse nada");
 
 			else {
-				if (access ("alert_fifo", F_OK) != 0)
-					mkfifo ("alert_fifo", 0600);
-
 				strcpy (alert_rep.buffer, req.argument[0]);
+				alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
+				write (alert_fifo, &alert_rep, sizeof (alert_rep));
+				close (alert_fifo);
 
 				for (i = 0; i < n_us_play; i++)
 					if (curr_user.client_pid != users_playing[i].client_pid
 						&& users_playing[i].lin == curr_user.lin
 						&& users_playing[i].col == curr_user.col) {
-						alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
-						write (alert_fifo, &alert_rep, sizeof (alert_rep));
-						kill (users_playing[i].client_pid, SIGUSR1);
-						close (alert_fifo);
-	
+
+						kill (users_playing[i].client_pid, SIGUSR1);	
 				}
 
 			}
@@ -362,6 +366,7 @@ int main (int argc, char *argv[])
 	}
 	fclose (user_fp);
 
+	close (alert_fifo);
 	close (server_fd);
 	unlink ("alert_fifo");
 	unlink (SERVER_FIFO);
