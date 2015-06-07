@@ -10,6 +10,7 @@ void terminate (int i)
 
 	close (server_fd);
 	unlink (SERVER_FIFO);
+	unlink (ALERT_FIFO);
 	exit (EXIT_SUCCESS);
 }
 
@@ -324,7 +325,10 @@ int main (int argc, char *argv[])
 				strcpy (rep.buffer, "Nao disse nada");
 
 			else {
-				strcpy (alert_rep.buffer, req.argument[0]);
+				strcpy (alert_rep.buffer, curr_user.nome);
+				strcat (alert_rep.buffer, " disse: ");
+				strcat (alert_rep.buffer, req.argument[0]);
+
 				alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
 				write (alert_fifo, &alert_rep, sizeof (alert_rep));
 				close (alert_fifo);
