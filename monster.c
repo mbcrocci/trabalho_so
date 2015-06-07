@@ -76,3 +76,15 @@ int is_monster_name (char name[10])
 
 	return 1;
 }
+
+void remove_monster (int i, int lin, int col)
+{
+	int j;
+	for (j = i; j < labirinto[lin][col].n_mnt - 1; j++)
+		labirinto[lin][col].monstros[j] = labirinto[lin][col].monstros[j+1];
+
+	memset (&labirinto[lin][col].monstros[labirinto[lin][col].n_mnt],
+			0, sizeof (monstro_t));
+
+	labirinto[lin][col].n_mnt--;	
+}

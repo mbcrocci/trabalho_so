@@ -77,6 +77,7 @@ typedef struct {
 // funcoes de montros 
 monstro_t new_monster(char *nome, int lin, int col);
 int is_monster_name (char name[10]);
+void remove_monster (int i, int lin, int col);
 
 
 #define MAX_N_SALAS 10
@@ -134,7 +135,7 @@ void remove_user_playing (pid_t client_pid);
 void clear_game (void);
 void update_position (pid_t client_pid, int lin, int col);
 int mover (pid_t client_pid, int p);
-void send_alert (pid_t pid, char mess[80]);
+void ataca_utilizador (pid_t pid, int f_ataque);
 
 
 #endif

@@ -217,8 +217,6 @@ int main (int argc, char *argv[])
 			if (!user_is_first (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao e o primeiro jogador, "
 				        "nao pode terminar o jogo");
-			else if (!user_is_playing (curr_user.client_pid))
-				strcpy (rep.buffer, "Nao esta a jogar, nao pode terminar o jogo");
 
 			else {
 				strcpy (rep.buffer, "Terminou o jogo");
@@ -459,6 +457,74 @@ int main (int argc, char *argv[])
 
 			}
 
+		} else if (!strcmp (req.command, "ataca")) {
+			if (!user_is_playing (curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta a jogar");
+
+			else if (!strcmp (req.argument[0], "") || !strcmp (req.argument[1], ""))
+				strcpy (rep.buffer, "Comando incompleto!");
+
+			else {
+				// ir saco ver a forca de ataque do objecto
+				for (i = 0; i < curr_user.n_obj; i++)
+					if (!strcmp (req.argument[1], curr_user.saco[i].nome)) {
+						n = curr_user.saco[i].f_ataque; // guarda o f_ataque do objecto
+						break;
+					}
+
+				// percorre os monstros da sala
+				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt; i++)
+					if (!strcmp (labirinto[curr_user.lin][curr_user.col].monstros[i].nome, req.argument[0])) {
+
+						labirinto[curr_user.lin][curr_user.col].monstros[i].hp -= n;
+
+						if (labirinto[curr_user.lin][curr_user.col].monstros[i].hp <= 0) {
+							remove_monster (i, curr_user.lin, curr_user.col);
+							sprintf (rep.buffer, "Matou %s!",
+									labirinto[curr_user.lin][curr_user.col].monstros[i].nome);
+
+						} else sprintf (rep.buffer, "Atacou %s este ficou com %d de vida",
+								labirinto[curr_user.lin][curr_user.col].monstros[i].nome,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].hp);
+						break;
+					}
+
+
+				// percorre os utilizadores da mesma sala
+				for (i = 0; i < n_us_play; i++)
+					if (curr_user.lin == users_playing[i].lin
+						&& curr_user.col == users_playing[i].col
+						&& !strcmp (req.argument[0], users_playing[i].nome)) {
+						
+						ataca_utilizador (users_playing[i].client_pid, n);
+
+						if (users_playing[i].hp <= 0) {
+							sprintf (rep.buffer, "Matou o utilizador %s!!", users_playing[i].nome);
+
+							// avisar o utilizador que morreu
+							strcpy (alert_rep.buffer, "Foi morto por outro jogador");
+
+							alert_fifo = open (ALERT_FIFO, O_WRONLY | O_NONBLOCK);
+							write (alert_fifo, &alert_rep, sizeof(alert_rep));
+							close (alert_fifo);
+
+							kill (users_playing[i].client_pid, SIGUSR1);
+							remove_user_playing (users_playing[i].client_pid);
+						} else {
+							sprintf (rep.buffer, "Atacou o utilizador %s, ele ficou com %d de vida",
+									users_playing[i].nome, users_playing[i].hp);
+							// avisar o utilizador que foi atacado 
+							sprintf (alert_rep.buffer, "Foi atacado por %s!!!", curr_user.nome); 
+
+							alert_fifo = open (ALERT_FIFO, O_WRONLY | O_NONBLOCK);
+							write (alert_fifo, &alert_rep, sizeof(alert_rep));
+							close (alert_fifo);
+
+							kill (users_playing[i].client_pid, SIGUSR1);
+						}
+						break;
+				}
+			}
 		} else if (!strcmp (req.command, "grita")) {
 			if (!user_is_playing(curr_user.client_pid))
 				strcpy (rep.buffer, "Nao esta jogar nao pode gritar");

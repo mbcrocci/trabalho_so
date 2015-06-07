@@ -170,14 +170,15 @@ int mover (pid_t client_pid, int p)
 	return 1;
 }
 
-void send_alert (pid_t pid, char mess[80])
+void ataca_utilizador (pid_t pid, int f_ataque)
 {
-	response_t rep;
-	char end[10];
-	int fd;
-	sprintf (end, "client_%d_fifo", pid);
-	strcpy (rep.buffer, mess);
-	fd = open (end, O_WRONLY);
-	write (fd, &rep, sizeof(rep));
-	close (fd);
+	int u, p;
+	user_t c;
+
+	u = find_user_index (pid);
+	p = find_user_playing_index (pid);
+	c = find_user (pid);
+
+	user_list[u].hp -= f_ataque;
+	users_playing[p].hp -= f_ataque;
 }

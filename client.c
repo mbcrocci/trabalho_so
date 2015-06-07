@@ -176,6 +176,15 @@ int main (void)
 					strcpy (req.argument[0], word[1]);
 			}
 
+			if (!strcmp (word[0], "ataca")) {
+				strcpy (req.command, "ataca");
+				if (word[1] != NULL)
+					strcpy (req.argument[0], word[1]);
+
+				if (word[2] != NULL)
+					strcpy (req.argument[1], word[2]);
+			}
+
 			// send request
 			n = write (server_fd, &req, sizeof (req));
 
