@@ -125,6 +125,7 @@ int user_is_playing (pid_t client_pid);
 int user_is_first (pid_t client_pid);
 user_t find_user (pid_t client_pid);
 int find_user_index (pid_t client_pid);
+int find_user_playing_index (pid_t client_pid);
 void remove_user (pid_t client_pid);
 void remove_user_playing (pid_t client_pid);
 void clear_game (void);

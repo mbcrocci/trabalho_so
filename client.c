@@ -9,7 +9,7 @@ void read_alert (int s)
 	alert_fifo = open (ALERT_FIFO, O_RDONLY | O_NONBLOCK);
 	read (alert_fifo, &rep, sizeof(rep));
 
-	fprintf(stderr, " Mensagem: %s\n>> ", rep.buffer);
+	fprintf(stderr, " %s\n>> ", rep.buffer);
 	close (alert_fifo);
 }
 
@@ -146,6 +146,13 @@ int main (void)
 					//	strcat (req.argument[0], word[i]);
 					// i++;
 					//}
+				}
+			}
+
+			if (!strcmp (word[0], "grita")) {
+				strcpy (req.command, "grita");
+				if (word[1] != NULL) {
+					strcpy (req.argument[0], word[1]);
 				}
 			}
 

@@ -338,6 +338,35 @@ int main (int argc, char *argv[])
 				}
 
 			}
+
+		} else if (!strcmp (req.command, "grita")) {
+			if (!user_is_playing(curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta jogar nao pode gritar");
+
+			else if (!strcmp (req.argument[0], ""))
+				strcpy (rep.buffer, "Nao gritou nada");
+
+			else {
+				strcpy (alert_rep.buffer, curr_user.nome);
+				strcat (alert_rep.buffer, " gritou: ");
+				strcat (alert_rep.buffer, req.argument[0]);
+
+				alert_fifo = open (ALERT_FIFO, O_WRONLY | O_NONBLOCK);
+				write (alert_fifo, &alert_rep, sizeof(alert_rep));
+				close (alert_fifo);
+
+				for (i = 0; i < n_us_play; i++)
+					if (users_playing[i].client_pid != curr_user.client_pid)
+						kill (users_playing[i].client_pid, SIGUSR1);
+
+				i = find_user_index (curr_user.client_pid);
+				user_list[i].hp -= 3;
+
+				i = find_user_playing_index (curr_user.client_pid);
+				users_playing[i].hp -= 3;
+
+				strcpy (rep.buffer, "Gritei");
+			}
 		} else if (!strcmp (req.command, "quem")) {
 			strcpy (rep.buffer, "\nUtilizadores logados: ");
 			for(i = 0; i < n_user; i++){

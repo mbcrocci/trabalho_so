@@ -81,6 +81,14 @@ int find_user_index (pid_t client_pid)
 			return i;
 }
 
+int find_user_playing_index (pid_t client_pid)
+{
+	int i;
+	for (i = 0; i < MAX_USERS; i++)
+		if (users_playing[i].client_pid == client_pid)
+			return i;
+}
+
 // remover utilizador da lista de jogadores ligados ao servidor
 void remove_user (pid_t client_pid)
 {
