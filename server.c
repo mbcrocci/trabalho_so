@@ -217,6 +217,9 @@ int main (int argc, char *argv[])
 			if (!user_is_first (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao e o primeiro jogador, "
 				        "nao pode terminar o jogo");
+			else if (!user_is_playing (curr_user.client_pid))
+				strcpy (rep.buffer, "Nao esta a jogar, nao pode terminar o jogo");
+
 			else {
 				strcpy (rep.buffer, "Terminou o jogo");
 				strcpy (alert_rep.buffer, "O Jogador 1 terminou o jogo.");
@@ -252,9 +255,24 @@ int main (int argc, char *argv[])
 		} else if (!strcmp (req.command, "desistir")){
 			if (user_is_playing (curr_user.client_pid)) {
 					strcpy (rep.buffer, "Desistiu");
+					strcpy (alert_rep.buffer, "O jogador ");
+					strcat (alert_rep.buffer, curr_user.nome);
+					strcat (alert_rep.buffer, "abandonou o jogo.");
+
+					alert_fifo = open ("alert_fifo", O_WRONLY | O_NONBLOCK);
+					write (alert_fifo, &alert_rep, sizeof (alert_rep));
+					close (alert_fifo);
+
+					for (i = 0; i < n_us_play; i++)
+						if (users_playing[i].client_pid != curr_user.client_pid)
+							kill (users_playing[i].client_pid, SIGUSR1);
+
 					remove_user_playing (curr_user.client_pid); n_us_play--;
 
 			} else strcpy (rep.buffer, "Nao esta a jogar, nao pode desistir");
+
+			if (n_us_play == 0)
+				game_started = 0;
 
 		} else if (!strcmp (req.command, "info")) {
 			// (TODO): FIX BUG
