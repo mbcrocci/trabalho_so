@@ -118,8 +118,8 @@ void remove_object_saco (int i, pid_t pid)
 	p = find_user_playing_index (pid);
 	c = find_user (pid);
 
-
 	user_list[u].peso_saco -= user_list[u].saco[i].peso;
+
 	for (j = i; j < c.n_obj-1; j++)
 		user_list[u].saco[j] = user_list[u].saco[j+1];
 	

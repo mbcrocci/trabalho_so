@@ -143,11 +143,12 @@ int main (void)
 				strcpy (req.command, "diz");
 				if (word[1] != NULL) {
 					strcpy (req.argument[0], word[1]);
-					//i = 1;
-					// while (word[i] != NULL) {
-					//	strcat (req.argument[0], word[i]);
-					// i++;
-					//}
+					i = 2;
+					while (word[i] != NULL) {
+						strcat (req.argument[0], " ");
+						strcat (req.argument[0], word[i]);
+						i++;
+					}
 				}
 			}
 
@@ -155,6 +156,13 @@ int main (void)
 				strcpy (req.command, "grita");
 				if (word[1] != NULL) {
 					strcpy (req.argument[0], word[1]);
+					i = 2;
+					while (word[i] != NULL) {
+						strcat (req.argument[0], " ");
+						strcat (req.argument[0], word[i]);
+						i++;
+					}
+
 				}
 			}
 

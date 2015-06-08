@@ -482,6 +482,8 @@ int main (int argc, char *argv[])
 
 						kill (users_playing[i].client_pid, SIGUSR1);	
 				}
+				strcpy (rep.buffer, "Disse: ");
+				strcat (rep.buffer, req.argument[0]);
 
 			}
 
@@ -514,9 +516,16 @@ int main (int argc, char *argv[])
 							sprintf (rep.buffer, "Matou %s!",
 									labirinto[curr_user.lin][curr_user.col].monstros[i].nome);
 
-						} else sprintf (rep.buffer, "Atacou %s este ficou com %d de vida",
+						} else {
+							sprintf (rep.buffer, "Atacou %s este ficou com %d de vida",
 								labirinto[curr_user.lin][curr_user.col].monstros[i].nome,
 								labirinto[curr_user.lin][curr_user.col].monstros[i].hp);
+
+							ataca_utilizador (curr_user.client_pid,
+								labirinto[curr_user.lin][curr_user.col].monstros[i].atac);
+
+							strcat (rep.buffer, "\nO montro que atacou, atacou-lhe!!");
+						}
 						break;
 					}
 
