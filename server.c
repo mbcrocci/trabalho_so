@@ -6,7 +6,20 @@ int N_SEG = 0;
 
 void terminate (int i)
 {
+	int j, alert_fifo;
+	response_t alert_rep;
+
 	fprintf (stderr, "\nSERVER TERMINATING\n");
+
+	strcpy (alert_rep.buffer, "O Servidor terminou, use o comando logout");
+
+	alert_fifo = open (ALERT_FIFO, O_WRONLY | O_NONBLOCK);
+	write (alert_fifo, &alert_rep, sizeof(alert_rep));
+	close (alert_fifo);
+
+	// Avisar os clientes que o server terminou
+	for (j = 0; j < MAX_USERS; j++)	
+		kill (user_list[j].client_pid, SIGUSR1);
 
 	close (server_fd);
 	unlink (SERVER_FIFO);
