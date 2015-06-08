@@ -3,6 +3,7 @@
 #include "util.h"
 
 int N_SEG = 0;
+int N_US = 0;
 
 void terminate (int i)
 {
@@ -18,7 +19,7 @@ void terminate (int i)
 	close (alert_fifo);
 
 	// Avisar os clientes que o server terminou
-	for (j = 0; j < MAX_USERS; j++)	
+	for (j = 0; j < N_US; j++)	
 		kill (user_list[j].client_pid, SIGUSR1);
 
 	close (server_fd);
@@ -37,7 +38,8 @@ int main (int argc, char *argv[])
 {
 	int n, i, timeout;
 	char response[REP_BUFF_SIZE], aviso_end[BUFF_SIZE];
-	char username[10], password[10];
+	char file_string[30];
+	char *user_pass[10];
 	char line[20];
 
 	int n_user=0, n_us_play=0, game_started=0;
@@ -100,6 +102,8 @@ int main (int argc, char *argv[])
 		if (!game_started)
 			N_SEG = 0;
 
+		N_US = n_user; // numero de utilizador para terminate
+
 		// clear buffers
 		memset (&req.command[0], 0, sizeof (req.command));
 		for (i = 0; i < 3; i++)
@@ -123,17 +127,24 @@ int main (int argc, char *argv[])
 
 		clearScreen ();
 		if (!strcmp (req.command, "AUTHENTICATE")) {
-			// (TODO): Ver se ja passou o timeout
-			// (TODO): ler fichereiro correctamente
 
-			//if (!strcmp (username, req.argument[0]) &&
-			//	!strcmp (password, req.argument[1])) {
+			for (i = 0; i < 10; i++){
+				fgets(file_string, 30, user_fp);
+				file_string[strlen (file_string)-1] = '\0';
+				user_pass[0] = strtok (file_string, ":");
+				user_pass[1] = strtok (NULL, " ");
 
-			strcpy(rep.buffer, "AUTHENTICATED");
+				if (!strcmp (user_pass[0], req.argument[0]) &&
+					!strcmp (user_pass[1], req.argument[1])) {
 
-			// adicionar utilizador a lista
-			user_list[n_user] = new_user (req.client_pid, req.argument[0]);
-			n_user++;
+					strcpy(rep.buffer, "AUTHENTICATED");
+
+					// adicionar utilizador a lista
+					user_list[n_user] = new_user (req.client_pid, req.argument[0]);
+					n_user++;
+					break;
+				}
+			}
 
 			fseek (user_fp, 0, SEEK_SET); // ir para o inicio do ficheiro
 
