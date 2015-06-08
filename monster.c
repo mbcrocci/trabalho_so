@@ -20,7 +20,7 @@ monstro_t new_monster(char nome[10])
         s = random_number (7,9);
         loot[0] = new_object ("moeda");
         return (monstro_t){
-            "escorpiao", .atac=a, .def=d,.hp=s,.agress=1,.estado=1,
+            "escorpiao", .atac=a, .def=d,.hp=s,.agress=1,.estado=1, .n_obj=1,
             .loot={*loot}
         };
     }
@@ -32,7 +32,7 @@ monstro_t new_monster(char nome[10])
         loot[0] = new_object ("faca");
 
         return (monstro_t){
-            "lobisomem", .atac=a, .def=d,.hp=s,.agress=1,.estado=0,
+            "lobisomem", .atac=a, .def=d,.hp=s,.agress=1,.estado=0, .n_obj=1,
             .loot={*loot}
         };
     }
@@ -44,7 +44,7 @@ monstro_t new_monster(char nome[10])
         loot[1] = new_object ("moeda");
 
         return (monstro_t){
-            "urso", .atac=a, .def=d,.hp=10,.agress=0,.estado=1,
+            "urso", .atac=a, .def=d,.hp=10,.agress=0,.estado=1, .n_obj=2,
             .loot={*loot}
         };
     }
@@ -58,7 +58,7 @@ monstro_t new_monster(char nome[10])
         loot[4] = new_object ("moeda");
 
         return (monstro_t){
-            "boss", .atac=a, .def=15,.hp=15,.agress=0,.estado=1,
+            "boss", .atac=a, .def=15,.hp=15,.agress=0,.estado=1, .n_obj=5,
             .loot={*loot}
         };
     }
@@ -79,6 +79,15 @@ int is_monster_name (char name[10])
 void remove_monster (int i, int lin, int col)
 {
 	int j;
+
+	// copiar o loot para a sala
+	for (j = 0; j < labirinto[lin][col].monstros[i].n_obj; j++) {
+		if (labirinto[lin][col].n_obj >= 5) break;
+
+		labirinto[lin][col].objectos[labirinto[lin][col].n_obj+1] = labirinto[lin][col].monstros[i].loot[j];
+		labirinto[lin][col].n_obj++;
+	}
+
 	for (j = i; j < labirinto[lin][col].n_mnt - 1; j++)
 		labirinto[lin][col].monstros[j] = labirinto[lin][col].monstros[j+1];
 

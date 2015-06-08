@@ -42,7 +42,7 @@ typedef struct {
 struct object {
 	char nome[OBJECT_NAME_SIZE];
 	float peso;
-	int raridade, f_ataque, f_defesa, max_uso;
+	int raridade, f_ataque, f_defesa, n_uso, max_uso;
 	int hp_diff, def_diff; // "Quando usado" e "Quando Equipado" respctivamente
 };
 
@@ -67,6 +67,7 @@ typedef struct {
     int hp;        // vida do monstro
     int agress;    // agressivo=1 ou passivo=0
     int estado;    // quieto=1 ou irrequieto=0
+	int n_obj;
     object_t loot[5]; // 5 pq p boss larga 5 moedas
 
 } monstro_t;

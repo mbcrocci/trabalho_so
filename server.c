@@ -421,6 +421,10 @@ int main (int argc, char *argv[])
 			else {
 				for (i = 0; i < curr_user.n_obj; i++) {
 					if (!strcmp (req.argument[0], curr_user.saco[i].nome)) {
+						if (curr_user.saco[i].max_uso == 0) {
+							strcpy ( rep.buffer, "Nao pode usar esse objecto");
+							break;
+						}
 						usa_objecto (i, curr_user.client_pid);
 
 						strcpy (rep.buffer, "Usou ");
@@ -471,6 +475,9 @@ int main (int argc, char *argv[])
 						n = curr_user.saco[i].f_ataque; // guarda o f_ataque do objecto
 						break;
 					}
+
+				// usar o objecto para caso for uma granada por exemplo
+				usa_objecto(i, curr_user.client_pid);
 
 				// percorre os monstros da sala
 				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt; i++)

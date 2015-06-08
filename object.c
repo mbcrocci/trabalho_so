@@ -142,6 +142,27 @@ void usa_objecto (int i, pid_t pid)
 
 	user_list[u].hp += user_list[u].saco[i].hp_diff;
 	users_playing[p].hp += users_playing[p].saco[i].hp_diff;
+	
+	// garantir que o hp nao fica maior que hp_max 
+	if (user_list[u].hp >= user_list[u].hp_max)
+		user_list[u].hp = user_list[u].hp_max; 
+
+	if (users_playing[p].hp >= users_playing[p].hp_max)
+		users_playing[p].hp = users_playing[p].hp_max;
+
+	// pode-se usar o objecto as vezes que quiser se max_suo==0
+	if (user_list[u].saco[i].max_uso == 0)
+		return;
+
+	// case exceda o numero de usos remover do saco
+	user_list[u].saco[i].n_uso++;
+	users_playing[p].saco[i].n_uso++;
+
+	if (user_list[u].saco[i].n_uso == user_list[u].saco[i].max_uso)
+		remove_object_saco (i, user_list[u].client_pid);
+
+	if (users_playing[p].saco[i].n_uso == users_playing[p].saco[i].max_uso)
+		remove_object_saco (i, users_playing[p].client_pid);
 }
 
 
