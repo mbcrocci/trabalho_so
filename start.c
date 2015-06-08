@@ -115,7 +115,7 @@ void random_start (void)
 		//strcpy (obj_name, obj_names[p]);
 
 		labirinto[lin][col].objectos[labirinto[lin][col].n_obj] = new_object (
-				obj_names[p], lin, col);
+				obj_names[p]);
 		labirinto[lin][col].n_obj++;
 	}
 
@@ -128,35 +128,35 @@ void random_start (void)
 		// 10 morcegos
 		if(i < 10) {
 			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
-					"morcego", lin, col);
+					"morcego");
 			labirinto[lin][col].n_mnt++;
 		}
 
 		// 10 escorpioes
 		else if(9 < i && i < 20) {
 			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
-					"escorpiao", lin, col);
+					"escorpiao");
 			labirinto[lin][col].n_mnt++;
 		}
 
 		// 5 lobisomens
 		else if(19 < i && i < 24) {
 			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
-					"lobisomem", lin, col);
+					"lobisomem");
 			labirinto[lin][col].n_mnt++;
 		}
 
 		// 3 ursos
 		else if(i < 23 && i < 25) {
 			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
-					"urso", lin, col);
+					"urso");
 			labirinto[lin][col].n_mnt++;
 		}
 
 		// 1 boss
 		else if(i == 25) {
 			labirinto[lin][col].monstros[labirinto[lin][col].n_mnt] = new_monster (
-					"boss", lin, col);
+					"boss");
 			labirinto[lin][col].n_mnt++;
 		}
 	}
@@ -210,7 +210,7 @@ void read_start_file (char *filename)
 			break;
 
 		// criar monstro e adicionar a lista
-		//monster_list[m] = new_monster (m_name, m_lin, m_col);
+		//monster_list[m] = new_monster ();
 		f_lin++;
 	}
 
@@ -218,7 +218,7 @@ void read_start_file (char *filename)
 		if (f_lin == 30)
 			break;
 
-		labirinto[o_lin][o_col].objectos[labirinto[o_lin][o_col].n_obj] = new_object (o_name, o_lin, o_col);
+		labirinto[o_lin][o_col].objectos[labirinto[o_lin][o_col].n_obj] = new_object (o_name);
 		f_lin++;
 	}
 

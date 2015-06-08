@@ -31,8 +31,8 @@ user_t new_user (pid_t client_pid, char nome[10])
 	strcpy (novo.nome, nome);
 
     // (TODO): o object tem a mesma lin, col que user
-    novo.saco[0] = new_object ("aspirina", 0, 0);
-    novo.saco[1] = new_object ("faca", 0, 0);
+    novo.saco[0] = new_object ("aspirina");
+    novo.saco[1] = new_object ("faca");
 
 	novo.n_obj += 2;
 

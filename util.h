@@ -44,7 +44,6 @@ struct object {
 	float peso;
 	int raridade, f_ataque, f_defesa, max_uso;
 	int hp_diff, def_diff; // "Quando usado" e "Quando Equipado" respctivamente
-	int lin, col;
 };
 
 typedef struct object object_t;
@@ -52,7 +51,7 @@ typedef struct object object_t;
 extern char obj_names[OBJECT_NUMBER][OBJECT_NAME_SIZE];
 
 // Funcoes de objectos
-object_t new_object (char name[10], int lin, int col);
+object_t new_object (char name[10]);
 int is_object_name (char name[10]);
 void apanha_objecto (int i, pid_t client_pid);
 void remove_object_sala (int i, int lin, int col);
@@ -70,12 +69,11 @@ typedef struct {
     int estado;    // quieto=1 ou irrequieto=0
     object_t loot[5]; // 5 pq p boss larga 5 moedas
 
-    int lin, col;
 } monstro_t;
 
 
-// funcoes de montros 
-monstro_t new_monster(char *nome, int lin, int col);
+// funcoes de montros
+monstro_t new_monster(char nome[10]);
 int is_monster_name (char name[10]);
 void remove_monster (int i, int lin, int col);
 
