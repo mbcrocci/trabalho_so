@@ -163,23 +163,35 @@ void random_start (void)
 	//show_all_monsters_objects();
 }
 
-void read_start_file (char *filename)
+void read_start_file (char filename[10])
 {
 	// Ficheiro
 	int f_lin = 0; // linha do ficheiro
 	char c;
 	FILE *start_fp;
+	char file_string[20], *file_words[10];
 
 	// labirinto
 	int lin = 0, col = 0, p = 0;
+	int s, used_s[53], r;
 
-	// monstro
-	char *m_name;
-	int m=0, m_lin, m_col;
-
-	//object
-	char *o_name;
-	int o=0, o_lin, o_col;
+	// possiveis descricoes para a sala
+	char sala_desc[53][30] = {
+	"baixa","com corredor baixo", "com corredor apertado", "fria",
+	"alta", "com corredor ventoso" , "escura", "de honra",
+	"com corredor escorregadio", "humida", "com corredor molhado", "do ceu"
+	"estreita", "com corredor lamacento", "quente", "ventosa",
+	"dourada", "nublada", "terrorifica", "da fantasia",
+	"do medo", "da escuridao", "fantastica", "calorosa",
+	"gelada", "empinada", "inclinada", "bombastica",
+	"luxuosa", "pequena", "simples", "moderna",
+	"de trofeus", "de arte", "cheia de tecnologia", "decorada com quadros",
+	"colorida", "axadrexada","animada", "com corredor estreito",
+	"de batalha", "simples", "refinada", "antiga",
+	"de musica", "de laboratorio", "de espelhos", "com escadas",
+	"de aula", "transparente", "invisivel","sofisticada",
+	"toda decorada"
+	};
 
 	if ((start_fp = fopen (filename, "r")) == NULL)
 		return;
@@ -201,30 +213,67 @@ void read_start_file (char *filename)
 		lin++;
 	}
 	// ao sair do loop dever se encontrar na 10 linha do ficheiro
-	if (f_lin != 10) f_lin++;
+	if (f_lin != 9) f_lin++;
 
-	// (TODO) Corrigir fscanfs;2
+	for (; f_lin < 32; f_lin++) {
+		fgets (file_string, 20, start_fp);
+		file_string[strlen (file_string)-1] = '\0';
 
-	while (fscanf (start_fp, "%s %d %d", m_name, &m_lin, &m_col) == 3) {
-		if (f_lin == 20)
-			break;
+		if (9 < f_lin && f_lin < 20) {
+			file_words[0] = strtok (file_string, " ");
+			file_words[1] = strtok (NULL, " ");
+			file_words[2] = strtok (NULL, " ");
 
-		// criar monstro e adicionar a lista
-		//monster_list[m] = new_monster ();
-		f_lin++;
+			lin = atoi (file_words[1]);
+			col = atoi (file_words[2]);
+
+			labirinto[lin][col].monstros[0] = new_monster (file_words[0]);
+			labirinto[lin][col].n_mnt++;
+
+		} else if (19 < f_lin && f_lin < 31) {
+			file_words[0] = strtok (file_string, " ");
+			file_words[1] = strtok (NULL, " ");
+			file_words[2] = strtok (NULL, " ");
+
+			lin = atoi (file_words[1]);
+			col = atoi (file_words[2]);
+			
+
+			labirinto[lin][col].objectos[0] = new_object (file_words[0]);
+			labirinto[lin][col].n_obj++;
+
+		} else if (f_lin == 31) {
+			file_words[0] = strtok (file_string, " ");
+			file_words[1] = strtok (NULL, " ");
+
+			s_inic_lin = atoi (file_words[0]);
+			s_inic_col = atoi (file_words[1]);			
+
+		} else break;
 	}
-
-	while (fscanf (start_fp, "%s %d %d", o_name, &o_lin, &o_col) == 3) {
-		if (f_lin == 30)
-			break;
-
-		labirinto[o_lin][o_col].objectos[labirinto[o_lin][o_col].n_obj] = new_object (o_name);
-		f_lin++;
-	}
-
-	fscanf (start_fp, "%d %d", &s_inic_lin, &s_inic_col);
 
 	fclose (start_fp);
+	
+	// Gerar as descricoes para as salas
+	r = 0;
+	for (lin = 0; lin < 10; lin++) {
+		for (col = 0; col < 10; col++) {
+			do { s = random_number (0, 52); } while (used_number (s, used_s));
+			used_s[r] = s; //r++;
+			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
+		}
+	}
+	memset (used_s, 0, sizeof(used_s));
+	r = 0;
+	for (; lin < 10; lin++) {
+		for (; col < 10; col++) {
+			do { s = random_number (0, 52); } while (used_number (s, used_s));
+			used_s[r] = s;
+			strcpy (labirinto[lin][col].descricao, sala_desc[s]);
+		}
+	}
+
+
 }
 
 void show_all_monsters_objects(void)

@@ -165,7 +165,7 @@ int main (int argc, char *argv[])
 				moedas++;
 
 				i = atoi (req.argument[1]);
-				if (i < 10){
+				if (i != 0){
 					random_start ();
 					game_started = 1;
 				}
