@@ -44,6 +44,8 @@ int main (int argc, char *argv[])
 
 	int n_user=0, n_us_play=0, game_started=0;
 
+	int cont=0; // usado para continuar no ver
+
 	FILE *user_fp;
 
 	int self_fifo, alert_fifo;
@@ -346,26 +348,41 @@ int main (int argc, char *argv[])
 								labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
 						strcat (rep.buffer, " ");
 				}
-			} else if (is_monster_name (req.argument[1])) {
+			} else {
 				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_mnt; i++) {
-					if (!strcmp (req.argument[1], labirinto[curr_user.lin][curr_user.col].monstros[i].nome)) {
+					if (!strcmp (req.argument[0], labirinto[curr_user.lin][curr_user.col].monstros[i].nome)) {
 
 						sprintf (rep.buffer, "HP: %d\nF_Ataque: %d\nF_Defesa: %d\n",
 								labirinto[curr_user.lin][curr_user.col].monstros[i].hp,
 								labirinto[curr_user.lin][curr_user.col].monstros[i].atac,
 								labirinto[curr_user.lin][curr_user.col].monstros[i].def);
-					}
-				}
-			} else if (is_object_name (req.argument[1])) {
+						cont = 1;
+						break;
+					} else strcpy (rep.buffer, "Nao existe na sala");
+				} 
+				if (!cont)
 				for (i = 0; i < labirinto[curr_user.lin][curr_user.col].n_obj; i++) {
-					if (!strcmp (req.argument[1], labirinto[curr_user.lin][curr_user.col].objectos[i].nome)) {
+					if (!strcmp (req.argument[0], labirinto[curr_user.lin][curr_user.col].objectos[i].nome)) {
 						strcpy  (rep.buffer, labirinto[curr_user.lin][curr_user.col].objectos[i].nome);
 						strcat (rep.buffer, "\nPeso: ");
 						sprintf (rep.buffer, "%s %f", rep.buffer,
 						   	labirinto[curr_user.lin][curr_user.col].objectos[i].peso);
-					}
+						cont = 1;
+						break;
+					} else strcpy (rep.buffer, "Nao existe na sala");
 				}
-			} else strcpy (rep.buffer, "Nao existe na sala");
+				if (!cont)
+				for (i = 0; i < n_us_play; i++) {
+					if (!strcmp (req.argument[0], users_playing[i].nome)
+						&& curr_user.lin == users_playing[i].lin
+						&& curr_user.col == users_playing[i].col) {
+
+						sprintf (rep.buffer, "HP: %d", users_playing[i].hp);
+						cont = 1;
+						break;
+					} else strcpy (rep.buffer, "Nao existe na sala");
+				}
+			} 
 		} else if (!strcmp (req.command, "mover")) {
 			if (!user_is_playing (curr_user.client_pid))
 				strcpy (rep.buffer, "Nao esta a jogar");
